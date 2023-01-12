@@ -180,3 +180,5 @@ var/global/list/acceptable_fruit_types = list(
 var/global/list/acceptable_nectar_types= list(
 	"waxcomb (honey)",
 	)
+
+// hi lol
