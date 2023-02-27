@@ -30,7 +30,7 @@
 			for(var/obj/item/I in T)
 				if(!suspension_field.contents.len)
 					suspension_field.icon_state = "energynet"
-					suspension_field.overlays += "shield2"
+					suspension_field.add_overlay("shield2")
 				I.forceMove(suspension_field)
 		else
 			deactivate()
@@ -99,7 +99,7 @@
 				anchored = FALSE
 			else
 				anchored = TRUE
-			playsound(loc, W.usesound, 50, 1)
+			playsound(loc, W.tool_sound, 50, 1)
 			to_chat(user, SPAN_NOTICE("You wrench the stabilising legs [anchored ? "into place" : "up against the body"]."))
 			if(anchored)
 				desc = "It is resting securely on four stubby legs."
@@ -151,7 +151,7 @@
 
 	if(collected)
 		suspension_field.icon_state = "energynet"
-		suspension_field.overlays += "shield2"
+		suspension_field.add_overlay("shield2")
 		visible_message(SPAN_NOTICE("[icon2html(thing = suspension_field, target = world)] [suspension_field] gently absconds [collected > 1 ? "something" : "several things"]."))
 	else
 		if(istype(T,/turf/simulated/mineral) || istype(T,/turf/simulated/wall))

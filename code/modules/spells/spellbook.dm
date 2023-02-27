@@ -224,8 +224,8 @@
 						if("scrying")
 							feedback_add_details("wizard_spell_learned","SO") //please do not change the abbreviation to keep data processing consistent. Add a unique id to any new spells
 							new /obj/item/scrying(get_turf(H))
-							if (!(XRAY in H.mutations))
-								H.mutations.Add(XRAY)
+							if (!(MUTATION_XRAY in H.mutations))
+								H.mutations.Add(MUTATION_XRAY)
 								H.AddSightSelf(SEE_MOBS|SEE_OBJS|SEE_TURFS)
 								H.SetSeeInDarkSelf(8)
 								H.SetSeeInvisibleSelf(SEE_INVISIBLE_LEVEL_TWO)
@@ -346,11 +346,11 @@
 
 	if(user.mind.special_verbs.len)
 		for(var/V in user.mind.special_verbs)
-			user.verbs -= V
+			remove_verb(user, V)
 
 	if(stored_swap.mind.special_verbs.len)
 		for(var/V in stored_swap.mind.special_verbs)
-			stored_swap.verbs -= V
+			remove_verb(stored_swap, V)
 
 	var/mob/observer/dead/ghost = stored_swap.ghostize(0)
 	ghost.spell_list = stored_swap.spell_list
@@ -360,7 +360,7 @@
 
 	if(stored_swap.mind.special_verbs.len)
 		for(var/V in user.mind.special_verbs)
-			user.verbs += V
+			add_verb(user, V)
 
 	ghost.mind.transfer_to(user)
 	user.key = ghost.key
@@ -368,7 +368,7 @@
 
 	if(user.mind.special_verbs.len)
 		for(var/V in user.mind.special_verbs)
-			user.verbs += V
+			add_verb(user, V)
 
 	to_chat(stored_swap, "<span class='warning'>You're suddenly somewhere else... and someone else?!</span>")
 	to_chat(user, "<span class='warning'>Suddenly you're staring at [src] again... where are you, who are you?!</span>")
@@ -408,7 +408,7 @@
 	if(istype(user, /mob/living/carbon/human))
 		to_chat(user, "<font size='15' color='red'><b>HOR-SIE HAS RISEN</b></font>")
 		var/obj/item/clothing/mask/horsehead/magichead = new /obj/item/clothing/mask/horsehead
-		ADD_TRAIT(magichead, TRAIT_NODROP, MAGIC_TRAIT)
+		ADD_TRAIT(magichead, TRAIT_ITEM_NODROP, MAGIC_TRAIT)
 		magichead.flags_inv = null	//so you can still see their face
 		magichead.voicechange = 1	//NEEEEIIGHH
 		user.drop_item_to_ground(user.wear_mask, INV_OP_FORCE)

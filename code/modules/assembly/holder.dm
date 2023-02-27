@@ -3,8 +3,7 @@
 	icon = 'icons/obj/assemblies/new_assemblies.dmi'
 	icon_state = "holder"
 	item_state = "assembly"
-	flags = PROXMOVE
-	throwforce = 5
+	throw_force = 5
 	w_class = ITEMSIZE_SMALL
 	throw_speed = 3
 	throw_range = 10
@@ -64,12 +63,6 @@
 			. += "\The [src] is ready!"
 		else
 			. += "\The [src] can be attached!"
-
-/obj/item/assembly_holder/HasProximity(atom/movable/AM as mob|obj)
-	if(a_left)
-		a_left.HasProximity(AM)
-	if(a_right)
-		a_right.HasProximity(AM)
 
 /obj/item/assembly_holder/Crossed(atom/movable/AM)
 	. = ..()
@@ -185,10 +178,10 @@
 	update_icon()
 	name = initial(name) + " ([tmr.time] secs)"
 
-	loc.verbs += /obj/item/assembly_holder/timer_igniter/verb/configure
+	add_obj_verb(src, /obj/item/assembly_holder/timer_igniter/verb/configure)
 
 /obj/item/assembly_holder/timer_igniter/detached()
-	loc.verbs -= /obj/item/assembly_holder/timer_igniter/verb/configure
+	remove_obj_verb(src, /obj/item/assembly_holder/timer_igniter/verb/configure)
 	..()
 
 /obj/item/assembly_holder/timer_igniter/verb/configure()

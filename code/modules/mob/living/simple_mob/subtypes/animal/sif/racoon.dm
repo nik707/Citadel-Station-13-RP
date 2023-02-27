@@ -31,7 +31,7 @@
 	has_hands = TRUE
 	humanoid_hands = TRUE
 
-	pass_flags = PASSTABLE
+	pass_flags = ATOM_PASS_TABLE
 
 	universal_understand = 1
 
@@ -144,20 +144,18 @@
 	..()
 
 /mob/living/simple_mob/animal/sif/sakimm/update_icon()
-	overlays.Cut()
+	cut_overlays()
 	..()
 	if(hat)
-		var/hat_state = hat.item_state ? hat.item_state : hat.icon_state
-		var/image/I = image(INV_HEAD_DEF_ICON, src, hat_state)
-		I.pixel_y = -15 // Sakimm are tiny!
-		I.appearance_flags = RESET_COLOR
-		add_overlay(I)
+		var/mutable_appearance/MA = hat.render_mob_appearance(src, SLOT_ID_HEAD, BODYTYPE_STRING_DEFAULT)
+		MA.appearance_flags = RESET_COLOR
+		add_overlay(MA)
 
 /mob/living/simple_mob/animal/sif/sakimm/Initialize(mapload)
 	. = ..()
 
-	verbs += /mob/living/proc/ventcrawl
-	verbs += /mob/living/proc/hide
+	add_verb(src, /mob/living/proc/ventcrawl)
+	add_verb(src, /mob/living/proc/hide)
 
 	if(randomize_size)
 		adjust_scale(rand(8, 11) / 10)

@@ -1,7 +1,6 @@
 /*
  * Holds procs to help with list operations
  */
-
 /// Picks from the list, with some safeties, and returns the "default" arg if it fails
 #define DEFAULTPICK(L, default) ((istype(L, /list) && L:len) ? pick(L) : default)
 /// Ensures L is initailized after this point
@@ -27,6 +26,8 @@
 #define LAZYNULL(L) L = null
 /// Null-safe L.Cut()
 #define LAZYCLEARLIST(L) if(L) L.Cut()
+/// Null-safe L.Copy()
+#define LAZYCOPY(L) (L? L.Copy() : null)
 /// Reads L or an empty list if L is not a list.  Note: Does NOT assign, L may be an expression.
 #define SANITIZE_LIST(L) ( islist(L) ? L : list() )
 #define SANITIZE_TO_LIST(L) ( islist(L) ? L : list(L) )
@@ -46,6 +47,8 @@
 
 /****
 	* Binary search sorted insert
+	* Sorts low to high.
+	*
 	* INPUT: Object to be inserted
 	* LIST: List to insert object into
 	* TYPECONT: The typepath of the contents of the list

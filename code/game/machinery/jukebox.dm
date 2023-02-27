@@ -169,7 +169,7 @@
 			SPAN_NOTICE("You [anchored ? "un" : ""]secure \the [src]."))
 
 		anchored = !anchored
-		playsound(src, W.usesound, 50, TRUE)
+		playsound(src, W.tool_sound, 50, TRUE)
 		power_change()
 		update_icon()
 		if(!anchored)
@@ -249,7 +249,7 @@
 				//M.Weaken(3)
 				//if(prob(30))
 					//M.Stun(10)
-					//M.Paralyse(4)
+					//M.Unconscious(4)
 				//else
 					//M.make_jittery(500)
 			//spawn(15)
@@ -333,7 +333,7 @@
 			SPAN_NOTICE("You [anchored ? "un" : ""]secure \the [src]."))
 
 		anchored = !anchored
-		playsound(src, W.usesound, 50, TRUE)
+		playsound(src, W.tool_sound, 50, TRUE)
 		power_change()
 		update_icon()
 		return

@@ -119,8 +119,6 @@
 			else
 				to_chat(user, "<span class='notice'>You need a tighter grip.</span>")
 
-
-
 /obj/machinery/shower
 	name = "shower"
 	desc = "The HS-451. Installed in the 2550s by the Hygiene Division."
@@ -176,20 +174,20 @@
 	if(I.is_wrench())
 		var/newtemp = input(user, "What setting would you like to set the temperature valve to?", "Water Temperature Valve") in temperature_settings
 		to_chat(user, "<span class='notice'>You begin to adjust the temperature valve with \the [I].</span>")
-		playsound(src.loc, I.usesound, 50, 1)
-		if(do_after(user, 50 * I.toolspeed))
+		playsound(src.loc, I.tool_sound, 50, 1)
+		if(do_after(user, 50 * I.tool_speed))
 			watertemp = newtemp
 			user.visible_message("<span class='notice'>[user] adjusts the shower with \the [I].</span>", "<span class='notice'>You adjust the shower with \the [I].</span>")
 			add_fingerprint(user)
 
 /obj/machinery/shower/update_icon()	//this is terribly unreadable, but basically it makes the shower mist up
-	overlays.Cut()					//once it's been on for a while, in addition to handling the water overlay.
+	cut_overlays()					//once it's been on for a while, in addition to handling the water overlay.
 	if(mymist)
 		qdel(mymist)
 		mymist = null
 
 	if(on)
-		overlays += image('icons/obj/watercloset.dmi', src, "water", MOB_LAYER + 1, dir)
+		add_overlay(image('icons/obj/watercloset.dmi', src, "water", MOB_LAYER + 1, dir))
 		if(temperature_settings[watertemp] < T20C)
 			return //no mist for cold water
 		if(!ismist)
@@ -211,7 +209,10 @@
 
 //Yes, showers are super powerful as far as washing goes.
 /obj/machinery/shower/proc/wash(atom/movable/O as obj|mob)
-	if(!on) return
+	if(!on)
+		return
+
+	O.clean_radiation(RAD_CONTAMINATION_CLEANSE_POWER, RAD_CONTAMINATION_CLEANSE_FACTOR)
 
 	if(isliving(O))
 		var/mob/living/L = O
@@ -308,7 +309,7 @@
 	for(var/thing in loc)
 		var/atom/movable/AM = thing
 		var/mob/living/L = thing
-		if(istype(AM) && !(AM.flags & ATOM_ABSTRACT))
+		if(istype(AM) && !(AM.atom_flags & ATOM_ABSTRACT))
 			wash(AM)
 			if(istype(L))
 				process_heat(L)
@@ -425,7 +426,7 @@
 					R.cell.charge -= 20
 				else
 					B.deductcharge(B.hitcost)
-				var/datum/gender/TU = gender_datums[user.get_visible_gender()]
+				var/datum/gender/TU = GLOB.gender_datums[user.get_visible_gender()]
 				user.visible_message( \
 					"<span class='danger'>[user] was stunned by [TU.his] wet [O]!</span>", \
 					"<span class='userdanger'>[user] was stunned by [TU.his] wet [O]!</span>")
@@ -533,9 +534,13 @@
 	var/plunge_mod = 1 //time*plunge_mod = total time we take to plunge an object
 	var/reinforced = FALSE //whether we do heavy duty stuff like geysers
 
-/obj/item/plunger/attack(obj/O, mob/living/user)
-	if(!O.plunger_act(src, user, reinforced))
+/obj/item/plunger/pre_attack(atom/target, mob/user, clickchain_flags, list/params)
+	if(!isobj(target))
 		return ..()
+	var/obj/O = target
+	if(O.plunger_act(src, user, reinforced))
+		return CLICKCHAIN_DO_NOT_PROPAGATE
+	return ..()
 
 /obj/item/plunger/throw_impact(atom/hit_atom, mob/living/carbon/human/target, target_zone)
 	. = ..()

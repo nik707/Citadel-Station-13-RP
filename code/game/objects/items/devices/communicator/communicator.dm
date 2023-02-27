@@ -82,7 +82,7 @@ var/global/list/obj/item/communicator/all_communicators = list()
 /obj/item/communicator/Initialize(mapload)
 	. = ..()
 	all_communicators += src
-	sortTim(all_communicators, /proc/cmp_name_asc)
+	tim_sort(all_communicators, /proc/cmp_name_asc)
 	node = get_exonet_node(src)
 	START_PROCESSING(SSobj, src)
 	camera = new(src)
@@ -347,6 +347,7 @@ var/global/list/obj/item/communicator/all_communicators = list()
 	communications across different stations, planets, or even star systems. You can wear this one on your wrist!"
 	icon = 'icons/obj/device.dmi'
 	icon_state = "commwatch"
+	item_flags = EQUIP_ALLOW_SINGLE_LIMB
 	slot_flags = SLOT_GLOVES
 
 /obj/item/communicator/watch/update_icon_state()

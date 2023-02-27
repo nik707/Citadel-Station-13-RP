@@ -3,8 +3,8 @@
 	name = "head"
 	icon = 'icons/obj/clothing/hats.dmi'
 	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items/lefthand_hats.dmi',
-		slot_r_hand_str = 'icons/mob/items/righthand_hats.dmi',
+		SLOT_ID_LEFT_HAND = 'icons/mob/items/lefthand_hats.dmi',
+		SLOT_ID_RIGHT_HAND = 'icons/mob/items/righthand_hats.dmi',
 		)
 	body_parts_covered = HEAD
 	slot_flags = SLOT_HEAD
@@ -16,12 +16,6 @@
 	var/brightness_on
 	var/on = 0
 	var/image/helmet_light
-
-	sprite_sheets = list(
-		SPECIES_TESHARI = 'icons/mob/clothing/species/teshari/head.dmi',
-		SPECIES_VOX = 'icons/mob/clothing/species/vox/head.dmi',
-		SPECIES_WEREBEAST = 'icons/mob/clothing/species/werebeast/head.dmi'
-		)
 
 	drop_sound = 'sound/items/drop/hat.ogg'
 // todo: this is an awful way to do it but it works
@@ -46,7 +40,8 @@
 	else if(!on && light_applied)
 		set_light(0)
 		light_applied = 0
-	update_icon(user)
+	update_icon()
+	update_worn_icon()
 	user.update_action_buttons()
 
 /obj/item/clothing/head/attack_ai(var/mob/user)
@@ -84,10 +79,8 @@
 		to_chat(user, "<span class='notice'>You crawl under \the [src].</span>")
 	return 1
 
-/obj/item/clothing/head/update_icon(var/mob/user)
-	var/mob/living/carbon/human/H
-	if(ishuman(user))
-		H = user
+/obj/item/clothing/head/update_icon()
+	var/mob/living/carbon/human/H = worn_mob()
 
 	if(on)
 		// Generate object icon.
@@ -106,5 +99,3 @@
 	else if(helmet_light)
 		cut_overlay(helmet_light)
 		helmet_light = null
-
-	user.update_inv_head() //Will redraw the helmet with the light on the mob

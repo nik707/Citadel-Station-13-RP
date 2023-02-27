@@ -21,7 +21,7 @@
 	C.setToxLoss(0)
 	C.setOxyLoss(0)
 	C.setCloneLoss(0)
-	C.SetParalysis(0)
+	C.SetUnconscious(0)
 	C.SetStunned(0)
 	C.SetWeakened(0)
 	C.radiation = 0
@@ -32,7 +32,7 @@
 		H.species.create_organs(H)
 		H.restore_all_organs(ignore_prosthetic_prefs=1) //Covers things like fractures and other things not covered by the above.
 		H.restore_blood()
-		H.mutations.Remove(HUSK)
+		H.mutations.Remove(MUTATION_HUSK)
 		H.status_flags &= ~DISFIGURED
 		H.update_icons_body()
 		for(var/limb in H.organs_by_name)
@@ -57,7 +57,7 @@
 	C.set_stat(CONSCIOUS)
 	C.forbid_seeing_deadchat = FALSE
 	C.timeofdeath = null
-	src.verbs -= /mob/proc/changeling_revive
+	remove_verb(src, /mob/proc/changeling_revive)
 	// re-add our changeling powers
 	C.make_changeling()
 

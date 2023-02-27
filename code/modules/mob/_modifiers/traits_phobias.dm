@@ -288,7 +288,7 @@
 				fear_amount += 1
 
 	var/turf/T = get_turf(holder)
-	if(T.get_lumcount() <= LIGHTING_SOFT_THRESHOLD) // Standing in complete darkness.
+	if(T.get_lumcount() <= 0) // Standing in complete darkness.
 		fear_amount += 5
 
 	return fear_amount
@@ -496,7 +496,7 @@
 
 		if(istype(thing, /obj/machinery/iv_drip))
 			var/obj/machinery/iv_drip/I = thing
-			if(I.beaker)
+			if(I.reagent_container)
 				fear_amount += 8
 			else
 				fear_amount += 6
@@ -670,4 +670,3 @@
 		"WetSkrell was a mistake."
 		)
 	return pick(generic_responses)
-

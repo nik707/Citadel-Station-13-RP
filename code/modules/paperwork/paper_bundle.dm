@@ -4,7 +4,7 @@
 	icon = 'icons/obj/bureaucracy.dmi'
 	icon_state = "paper"
 	item_state = "paper"
-	throwforce = 0
+	throw_force = 0
 	w_class = ITEMSIZE_SMALL
 	throw_range = 2
 	throw_speed = 1
@@ -75,7 +75,7 @@
 	if(P.lit && !user.restrained())
 		if(istype(P, /obj/item/flame/lighter/zippo))
 			class = "rose>"
-		var/datum/gender/TU = gender_datums[user.get_visible_gender()]
+		var/datum/gender/TU = GLOB.gender_datums[user.get_visible_gender()]
 		user.visible_message("<span class='[class]'>[user] holds \the [P] up to \the [src], it looks like [TU.he] [TU.is] trying to burn it!</span>", \
 		"<span class='[class]'>You hold \the [P] up to \the [src], burning it slowly.</span>")
 
@@ -162,7 +162,7 @@
 				playsound(src.loc, "pageturn", 50, 1)
 		if(href_list["remove"])
 			var/obj/item/W = pages[page]
-			usr.put_in_hands(W)
+			usr.grab_item_from_interacted_with(W, src)
 			pages.Remove(pages[page])
 
 			to_chat(usr, "<span class='notice'>You remove the [W.name] from the bundle.</span>")
@@ -170,7 +170,7 @@
 			if(pages.len <= 1)
 				var/obj/item/paper/P = src[1]
 				usr.temporarily_remove_from_inventory(src, INV_OP_FORCE | INV_OP_SHOULD_NOT_INTERCEPT | INV_OP_SILENT)
-				usr.put_in_hands(P)
+				usr.put_in_hands_or_drop(P)
 				qdel(src)
 				return
 
@@ -211,7 +211,7 @@
 /obj/item/paper_bundle/update_icon()
 	var/obj/item/paper/P = pages[1]
 	icon_state = P.icon_state
-	overlays = P.overlays
+	copy_overlays(P)
 	underlays = 0
 	var/i = 0
 	var/photo
@@ -229,12 +229,12 @@
 			var/obj/item/photo/Ph = O
 			img = Ph.tiny
 			photo = 1
-			overlays += img
+			add_overlay(img)
 	if(i>1)
 		desc =  "[i] papers clipped to each other."
 	else
 		desc = "A single sheet of paper."
 	if(photo)
 		desc += "\nThere is a photo attached to it."
-	overlays += image('icons/obj/bureaucracy.dmi', "clip")
+	add_overlay(image('icons/obj/bureaucracy.dmi', "clip"))
 	return

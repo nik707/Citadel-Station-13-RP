@@ -16,8 +16,8 @@
 	var/mob/living/carbon/human/wearer = null 	// To check if the wearer changes, so species spritesheets change properly.
 	var/list/on_rolled = list()					// Used when jumpsuit sleevels are rolled ("rolled" entry) or it's rolled down ("down"). Set to "none" to hide in those states.
 	sprite_sheets = list(
-		SPECIES_TESHARI = 'icons/mob/clothing/species/teshari/ties.dmi', //Teshari can into webbing, too!
-		SPECIES_VOX = 'icons/mob/clothing/species/vox/ties.dmi')
+		BODYTYPE_STRING_TESHARI = 'icons/mob/clothing/species/teshari/ties.dmi', //Teshari can into webbing, too!
+		BODYTYPE_STRING_VOX = 'icons/mob/clothing/species/vox/ties.dmi')
 	drop_sound = 'sound/items/drop/accessory.ogg'
 	pickup_sound = 'sound/items/pickup/accessory.ogg'
 
@@ -29,6 +29,7 @@
 /obj/item/clothing/accessory/worn_mob()
 	return has_suit? has_suit.worn_mob() : ..()
 
+// todo: refactor entirely, we shouldn't have /obj/item/clothing/accessory
 /obj/item/clothing/accessory/proc/get_inv_overlay()
 	if(!inv_overlay)
 		var/tmp_icon_state = "[overlay_state? "[overlay_state]" : "[icon_state]"]"
@@ -54,16 +55,16 @@
 
 	if(istype(loc,/obj/item/clothing/under))
 		var/obj/item/clothing/under/C = loc
-		if(on_rolled["down"] && C.rolled_down > 0)
+		if(on_rolled["down"] && C.worn_rolled_down == UNIFORM_ROLL_TRUE)
 			tmp_icon_state = on_rolled["down"]
-		else if(on_rolled["rolled"] && C.rolled_sleeves > 0)
+		else if(on_rolled["rolled"] && C.worn_rolled_sleeves == UNIFORM_ROLL_TRUE)
 			tmp_icon_state = on_rolled["rolled"]
 
 	if(icon_override)
 		if("[tmp_icon_state]_mob" in icon_states(icon_override))
 			tmp_icon_state = "[tmp_icon_state]_mob"
 		mob_overlay = image("icon" = icon_override, "icon_state" = "[tmp_icon_state]")
-	else if(wearer && sprite_sheets[wearer.species.get_worn_legacy_bodytype(wearer)]) //Teshari can finally into webbing, too!
+	else if(wearer && sprite_sheets[bodytype_to_string(wearer.species.get_effective_bodytype(wearer, src, has_suit.worn_slot))]) //Teshari can finally into webbing, too!
 		mob_overlay = image("icon" = sprite_sheets[wearer.species.get_worn_legacy_bodytype(wearer)], "icon_state" = "[tmp_icon_state]")
 	else
 		mob_overlay = image("icon" = INV_ACCESSORIES_DEF_ICON, "icon_state" = "[tmp_icon_state]")
@@ -197,26 +198,28 @@
 /obj/item/clothing/accessory/stethoscope/do_surgery(mob/living/carbon/human/M, mob/living/user)
 	if(user.a_intent != INTENT_HELP) //in case it is ever used as a surgery tool
 		return ..()
-	attack(M, user) //default surgery behaviour is just to scan as usual
-	return 1
+	return TRUE
 
-/obj/item/clothing/accessory/stethoscope/attack(mob/living/carbon/human/M, mob/living/user)
-	if(ishuman(M) && isliving(user))
+/obj/item/clothing/accessory/stethoscope/attack_mob(mob/target, mob/user, clickchain_flags, list/params, mult, target_zone, intent)
+	if(user.a_intent == INTENT_HARM)
+		return ..()
+	if(ishuman(target) && isliving(user))
+		var/mob/living/carbon/human/H = target
 		if(user.a_intent == INTENT_HELP)
 			var/body_part = parse_zone(user.zone_sel.selecting)
 			if(body_part)
 				var/their = "their"
-				switch(M.gender)
+				switch(H.gender)
 					if(MALE)	their = "his"
 					if(FEMALE)	their = "her"
 
 				var/sound = "heartbeat"
 				var/sound_strength = "cannot hear"
 				var/heartbeat = 0
-				var/obj/item/organ/internal/heart/heart = M.internal_organs_by_name[O_HEART]
+				var/obj/item/organ/internal/heart/heart = H.internal_organs_by_name[O_HEART]
 				if(heart && !(heart.robotic >= ORGAN_ROBOT))
 					heartbeat = 1
-				if(M.stat == DEAD || (M.status_flags&FAKEDEATH))
+				if(H.stat == DEAD || (H.status_flags&FAKEDEATH))
 					sound_strength = "cannot hear"
 					sound = "anything"
 				else
@@ -225,15 +228,15 @@
 							sound_strength = "hear"
 							sound = "no heartbeat"
 							if(heartbeat)
-								if(heart.is_bruised() || M.getOxyLoss() > 50)
+								if(heart.is_bruised() || H.getOxyLoss() > 50)
 									sound = "[pick("odd noises in","weak")] heartbeat"
 								else
 									sound = "healthy heartbeat"
 
-							var/obj/item/organ/internal/heart/L = M.internal_organs_by_name[O_LUNGS]
-							if(!L || M.losebreath)
+							var/obj/item/organ/internal/heart/L = H.internal_organs_by_name[O_LUNGS]
+							if(!L || H.losebreath)
 								sound += " and no respiration"
-							else if(M.is_lung_ruptured() || M.getOxyLoss() > 50)
+							else if(H.is_lung_ruptured() || H.getOxyLoss() > 50)
 								sound += " and [pick("wheezing","gurgling")] sounds"
 							else
 								sound += " and healthy respiration"
@@ -245,9 +248,9 @@
 								sound_strength = "hear a weak"
 								sound = "pulse"
 
-				user.visible_message("[user] places [src] against [M]'s [body_part] and listens attentively.", "You place [src] against [their] [body_part]. You [sound_strength] [sound].")
+				user.visible_message("[user] places [src] against [H]'s [body_part] and listens attentively.", "You place [src] against [their] [body_part]. You [sound_strength] [sound].")
 				return
-	return ..(M,user)
+	return ..()
 
 //Medals
 /obj/item/clothing/accessory/medal
@@ -428,7 +431,6 @@
 		to_chat(M, "You dedicate the bracelet to [input], remembering the times you've had together.")
 		return 1
 
-
 /obj/item/clothing/accessory/bracelet/material
 	icon_state = "materialbracelet"
 
@@ -576,7 +578,7 @@
 		if(istype(has_suit) && ishuman(has_suit.loc))
 			H = has_suit.loc
 	if(istype(H))
-		if(H.species.name == SPECIES_TESHARI)
+		if(H.species.get_species_id() == SPECIES_ID_TESHARI)
 			icon_override = 'icons/mob/clothing/species/teshari/ties.dmi'
 		update_worn_icon()
 
@@ -866,15 +868,23 @@
 //Primal
 /obj/item/clothing/accessory/talisman
 	name = "bone talisman"
-	desc = "A hunter's talisman, some say the old gods smile on those who wear it."
+	desc = "A Scori religious talisman. Some say the Buried Ones smile on those who wear it."
 	icon_state = "talisman"
 	armor = list("melee" = 5, "bullet" = 5, "laser" = 0, "energy" = 0, "bomb" = 10, "bio" = 20, "rad" = 5, "fire" = 0, "acid" = 25)
+	slot = ACCESSORY_SLOT_TIE
+
+/obj/item/clothing/accessory/disenchanted_talisman
+	name = "disenchanted bone talisman"
+	desc = "A Scori religious talisman, perhaps given as a gift. Whatever protections such an item may have once brought have since faded away."
+	icon_state = "talisman"
+	slot = ACCESSORY_SLOT_TIE
 
 /obj/item/clothing/accessory/skullcodpiece
 	name = "skull codpiece"
 	desc = "A skull shaped ornament, intended to protect the important things in life."
 	icon_state = "skull"
 	armor = list("melee" = 5, "bullet" = 5, "laser" = 0, "energy" = 0, "bomb" = 10, "bio" = 20, "rad" = 5, "fire" = 0, "acid" = 25)
+	slot = ACCESSORY_SLOT_DECOR
 
 /obj/item/clothing/accessory/skullcodpiece/fake
 	name = "false codpiece"

@@ -115,14 +115,13 @@
 	if(!can_see_target(the_target))
 		return FALSE
 
-	if(istype(the_target, /mob/zshadow))
-		return FALSE // no
-
 	if(isliving(the_target))
 		var/mob/living/L = the_target
 		if(ishuman(L) || issilicon(L))
 			if(L.key && !L.client)	// SSD players get a pass
 				return FALSE
+		if(holder.IIsAlly(L))
+			return FALSE
 		if(L.stat)
 			if(L.stat == DEAD && !handle_corpse) // Leave dead things alone
 				return FALSE
@@ -131,8 +130,6 @@
 					return TRUE
 				else
 					return FALSE
-		if(holder.IIsAlly(L))
-			return FALSE
 		return TRUE
 
 	if(istype(the_target, /obj/mecha))
@@ -207,17 +204,17 @@
 		lose_target_position()
 
 	if(last_turf_display && target_last_seen_turf)
-		target_last_seen_turf.overlays -= last_turf_overlay
+		target_last_seen_turf.cut_overlay(last_turf_overlay)
 
 	target_last_seen_turf = get_turf(target)
 
 	if(last_turf_display)
-		target_last_seen_turf.overlays += last_turf_overlay
+		target_last_seen_turf.add_overlay(last_turf_overlay)
 
 // Resets the last known position to null.
 /datum/ai_holder/proc/lose_target_position()
 	if(last_turf_display && target_last_seen_turf)
-		target_last_seen_turf.overlays -= last_turf_overlay
+		target_last_seen_turf.cut_overlay(last_turf_overlay)
 	ai_log("lose_target_position() : Last position is being reset.", AI_LOG_INFO)
 	target_last_seen_turf = null
 

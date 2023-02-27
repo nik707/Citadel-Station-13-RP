@@ -37,14 +37,14 @@
 			to_chat(user, "<span class='notice'>You reach to pin your paper to the board but hesitate. You are certain your paper will not be seen among the many others already attached.</span>")
 	if(O.is_wrench())
 		to_chat(user, "<span class='notice'>You start to unwrench the noticeboard.</span>")
-		playsound(src.loc, O.usesound, 50, 1)
-		if(do_after(user, 15 * O.toolspeed))
+		playsound(src.loc, O.tool_sound, 50, 1)
+		if(do_after(user, 15 * O.tool_speed))
 			to_chat(user, "<span class='notice'>You unwrench the noticeboard.</span>")
 			new /obj/item/frame/noticeboard( src.loc )
 			qdel(src)
 
 /obj/structure/noticeboard/attack_hand(var/mob/user)
-	examine(user)
+	user.do_examinate(src)
 
 // Since Topic() never seems to interact with usr on more than a superficial
 // level, it should be fine to let anyone mess with the board other than ghosts.

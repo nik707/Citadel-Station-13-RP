@@ -87,7 +87,7 @@
 	if(istype(I, /obj/item/tool/crowbar))
 		if(modkits.len)
 			to_chat(user, "<span class='notice'>You pry the modifications out.</span>")
-			playsound(loc, I.usesound, 100, 1)
+			playsound(loc, I.tool_sound, 100, 1)
 			for(var/obj/item/borg/upgrade/modkit/M in modkits)
 				M.uninstall(src)
 		else
@@ -234,7 +234,7 @@
 		pressure_decrease_active = TRUE
 	return ..()
 
-/obj/item/projectile/kinetic/attack_mob(mob/living/target_mob, distance, miss_modifier)
+/obj/item/projectile/kinetic/projectile_attack_mob(mob/living/target_mob, distance, miss_modifier)
 	if(!pressure_decrease_active && !lavaland_environment_check(get_turf(src)))
 		name = "weakened [name]"
 		damage = damage * pressure_decrease

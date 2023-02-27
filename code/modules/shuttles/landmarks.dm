@@ -5,7 +5,7 @@
 	icon_state = "energynet"
 	anchored = 1
 	unacidable = 1
-	flags = ATOM_ABSTRACT
+	atom_flags = ATOM_ABSTRACT
 	invisibility = 101
 	var/shuttle_landmark_flags = SLANDMARK_FLAG_AUTOSET	// We generally want to use current area/turf as base.
 
@@ -56,6 +56,7 @@
 	if(GLOB.using_map.use_overmap)
 		var/obj/effect/overmap/visitable/location = get_overmap_sector(z)
 		if(location && location.docking_codes)
+
 			docking_controller.docking_codes = location.docking_codes
 
 /obj/effect/shuttle_landmark/forceMove()

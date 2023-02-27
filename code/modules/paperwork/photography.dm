@@ -110,6 +110,7 @@ var/global/photo_count = 0
 	desc = "A polaroid camera. 10 photos left."
 	icon_state = "camera"
 	item_state = "camera"
+	item_flags = ITEM_NOBLUDGEON
 	w_class = ITEMSIZE_SMALL
 	slot_flags = SLOT_BELT
 	matter = list(MAT_STEEL = 2000)
@@ -128,9 +129,6 @@ var/global/photo_count = 0
 	if(nsize)
 		size = nsize
 		to_chat(usr, "<span class='notice'>Camera will now take [size]x[size] photos.</span>")
-
-/obj/item/camera/attack(mob/living/carbon/human/M as mob, mob/user as mob)
-	return
 
 /obj/item/camera/attack_self(mob/user as mob)
 	on = !on
@@ -179,7 +177,7 @@ var/global/photo_count = 0
 	for(var/i; i <= sorted.len; i++)
 		var/atom/A = sorted[i]
 		if(A)
-			var/icon/img = getFlatIcon(A)
+			var/icon/img = get_flat_icon(A)
 
 			// If what we got back is actually a picture, draw it.
 			if(istype(img, /icon))
@@ -200,7 +198,7 @@ var/global/photo_count = 0
 		// Calculate where we are relative to the center of the photo
 		var/xoff = (the_turf.x - center.x) * 32 + center_offset
 		var/yoff = (the_turf.y - center.y) * 32 + center_offset
-		res.Blend(getFlatIcon(the_turf.loc), blendMode2iconMode(the_turf.blend_mode),xoff,yoff)
+		res.Blend(get_flat_icon(the_turf.loc), blendMode2iconMode(the_turf.blend_mode),xoff,yoff)
 	return res
 
 

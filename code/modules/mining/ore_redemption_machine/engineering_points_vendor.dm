@@ -23,7 +23,8 @@
 		new /datum/data/mining_equipment("GPS Device",					    /obj/item/gps/engineering,									    1),
 		new /datum/data/mining_equipment("50 Point Transfer Card",		    /obj/item/card/mining_point_card/engineering,				    50),
 		new /datum/data/mining_equipment("Umbrella",					    /obj/item/melee/umbrella/random,								20),
-		new /datum/data/mining_equipment("Space Cash",					    /obj/item/spacecash/c100,									    4),
+		new /datum/data/mining_equipment("100 Thaler",					    /obj/item/spacecash/c100,									    4),
+		new /datum/data/mining_equipment("1000 Thaler",					    /obj/item/spacecash/c1000,									    40),
 		new /datum/data/mining_equipment("Hardsuit - Control Module",       /obj/item/rig/industrial,									    50),
 		new /datum/data/mining_equipment("Hardsuit - Plasma Cutter",	    /obj/item/rig_module/device/plasmacutter,						10),
 		new /datum/data/mining_equipment("Hardsuit - Maneuvering Jets",	    /obj/item/rig_module/maneuvering_jets,							12),
@@ -91,7 +92,7 @@
 			if(href_list["choice"] == "eject")
 				to_chat(usr, "<span class='notice'>You eject the ID from [src]'s card slot.</span>")
 				if(ishuman(usr))
-					usr.put_in_hands(inserted_id)
+					usr.put_in_hands_or_drop(inserted_id)
 					inserted_id = null
 				else
 					inserted_id.forceMove(get_turf(src))

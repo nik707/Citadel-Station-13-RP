@@ -22,7 +22,7 @@
 
 
 /obj/item/toy
-	throwforce = 0
+	throw_force = 0
 	throw_speed = 4
 	throw_range = 20
 	force = 0
@@ -36,13 +36,11 @@
 	desc = "A translucent balloon. There's nothing in it."
 	icon = 'icons/obj/toy.dmi'
 	icon_state = "waterballoon-e"
+	force = 0
 
 /obj/item/toy/balloon/Initialize(mapload)
 	. = ..()
 	create_reagents(10)
-
-/obj/item/toy/balloon/attack(mob/living/carbon/human/M as mob, mob/user as mob)
-	return
 
 /obj/item/toy/balloon/afterattack(atom/A as mob|obj, mob/user as mob, proximity)
 	if(!proximity) return
@@ -91,7 +89,7 @@
 /obj/item/toy/syndicateballoon
 	name = "criminal balloon"
 	desc = "There is a tag on the back that reads \"FUK NT!11!\"."
-	throwforce = 0
+	throw_force = 0
 	throw_speed = 4
 	throw_range = 20
 	force = 0
@@ -102,7 +100,7 @@
 /obj/item/toy/nanotrasenballoon
 	name = "criminal balloon"
 	desc = "Across the balloon the following is printed: \"Man, I love NanoTrasen soooo much. I use only NT products. You have NO idea.\""
-	throwforce = 0
+	throw_force = 0
 	throw_speed = 4
 	throw_range = 20
 	force = 0
@@ -213,25 +211,26 @@
 			O.show_message(text("<span class='warning'>\The [] realized they were out of ammo and starting scrounging for some!</span>", user), 1)
 
 
-/obj/item/toy/crossbow/attack(mob/M as mob, mob/user as mob)
+/obj/item/toy/crossbow/attack_mob(mob/target, mob/user, clickchain_flags, list/params, mult, target_zone, intent)
+	. = ..()
 	src.add_fingerprint(user)
 
 // ******* Check
 
-	if (src.bullets > 0 && M.lying)
+	if (src.bullets > 0 && target.lying)
 
-		for(var/mob/O in viewers(M, null))
+		for(var/mob/O in viewers(target, null))
 			if(O.client)
-				O.show_message(text("<span class='danger'>\The [] casually lines up a shot with []'s head and pulls the trigger!</span>", user, M), 1, "<span class='warning'>You hear the sound of foam against skull</span>", 2)
-				O.show_message(text("<span class='warning'>\The [] was hit in the head by the foam dart!</span>", M), 1)
+				O.show_message(text("<span class='danger'>\The [] casually lines up a shot with []'s head and pulls the trigger!</span>", user, target), 1, "<span class='warning'>You hear the sound of foam against skull</span>", 2)
+				O.show_message(text("<span class='warning'>\The [] was hit in the head by the foam dart!</span>", target), 1)
 
 		playsound(user.loc, 'sound/items/syringeproj.ogg', 50, 1)
-		new /obj/item/toy/ammo/crossbow(M.loc)
+		new /obj/item/toy/ammo/crossbow(target.loc)
 		src.bullets--
-	else if (M.lying && src.bullets == 0)
-		for(var/mob/O in viewers(M, null))
+	else if (target.lying && src.bullets == 0)
+		for(var/mob/O in viewers(target, null))
 			if (O.client)
-				O.show_message(text("<span class='danger'>\The [] casually lines up a shot with []'s head, pulls the trigger, then realizes they are out of ammo and drops to the floor in search of some!</span>", user, M), 1, "<span class='warning'>You hear someone fall</span>", 2)
+				O.show_message(text("<span class='danger'>\The [] casually lines up a shot with []'s head, pulls the trigger, then realizes they are out of ammo and drops to the floor in search of some!</span>", user, target), 1, "<span class='warning'>You hear someone fall</span>", 2)
 		user.Weaken(5)
 
 /obj/item/toy/ammo/crossbow
@@ -259,33 +258,33 @@
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "sword0"
 	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items/lefthand_melee.dmi',
-		slot_r_hand_str = 'icons/mob/items/righthand_melee.dmi',
+		SLOT_ID_LEFT_HAND = 'icons/mob/items/lefthand_melee.dmi',
+		SLOT_ID_RIGHT_HAND = 'icons/mob/items/righthand_melee.dmi',
 		)
 	var/active = 0.0
 	w_class = ITEMSIZE_SMALL
 	attack_verb = list("attacked", "struck", "hit")
 
-	attack_self(mob/user as mob)
-		src.active = !( src.active )
-		if (src.active)
-			to_chat(user, "<span class='notice'>You extend the plastic blade with a quick flick of your wrist.</span>")
-			playsound(user, 'sound/weapons/saberon.ogg', 50, 1)
-			src.icon_state = "swordblue"
-			src.w_class = ITEMSIZE_LARGE
-		else
-			to_chat(user, "<span class='notice'>You push the plastic blade back down into the handle.</span>")
-			playsound(user, 'sound/weapons/saberoff.ogg', 50, 1)
-			src.icon_state = "sword0"
-			src.w_class = ITEMSIZE_SMALL
+/obj/item/toy/sword/attack_self(mob/user)
+	src.active = !( src.active )
+	if (src.active)
+		to_chat(user, SPAN_NOTICE("You extend the plastic blade with a quick flick of your wrist."))
+		playsound(user, 'sound/weapons/saberon.ogg', 50, TRUE)
+		src.icon_state = "swordblue"
+		src.w_class = ITEMSIZE_LARGE
+	else
+		to_chat(user, SPAN_NOTICE("You push the plastic blade back down into the handle."))
+		playsound(user, 'sound/weapons/saberoff.ogg', 50, TRUE)
+		src.icon_state = "sword0"
+		src.w_class = ITEMSIZE_SMALL
 
-		if(istype(user,/mob/living/carbon/human))
-			var/mob/living/carbon/human/H = user
-			H.update_inv_l_hand()
-			H.update_inv_r_hand()
+	if(istype(user,/mob/living/carbon/human))
+		var/mob/living/carbon/human/H = user
+		H.update_inv_l_hand()
+		H.update_inv_r_hand()
 
-		src.add_fingerprint(user)
-		return
+	src.add_fingerprint(user)
+	return
 
 /obj/item/toy/katana
 	name = "replica katana"
@@ -294,12 +293,12 @@
 	icon_state = "katana"
 	item_state = "katana"
 	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items/lefthand_material.dmi',
-		slot_r_hand_str = 'icons/mob/items/righthand_material.dmi',
+		SLOT_ID_LEFT_HAND = 'icons/mob/items/lefthand_material.dmi',
+		SLOT_ID_RIGHT_HAND = 'icons/mob/items/righthand_material.dmi',
 		)
 	slot_flags = SLOT_BELT | SLOT_BACK
 	force = 5
-	throwforce = 5
+	throw_force = 5
 	w_class = ITEMSIZE_NORMAL
 	attack_verb = list("attacked", "slashed", "stabbed", "sliced")
 
@@ -313,15 +312,20 @@
 	icon_state = "snappop"
 	w_class = ITEMSIZE_TINY
 
-	throw_impact(atom/hit_atom)
-		..()
-		var/datum/effect_system/spark_spread/s = new /datum/effect_system/spark_spread
-		s.set_up(3, 1, src)
-		s.start()
-		new /obj/effect/debris/cleanable/ash(src.loc)
-		src.visible_message("<span class='warning'>The [src.name] explodes!</span>","<span class='warning'>You hear a snap!</span>")
-		playsound(src, 'sound/effects/snap.ogg', 50, 1)
-		qdel(src)
+/obj/item/toy/snappop/throw_impact(atom/hit_atom)
+	..()
+	var/datum/effect_system/spark_spread/s = new /datum/effect_system/spark_spread
+	s.set_up(3, 1, src)
+	s.start()
+	new /obj/effect/debris/cleanable/ash(src.loc)
+	src.visible_message(
+		SPAN_WARNING("The [src.name] explodes!"),
+		SPAN_WARNING("You hear a snap!"),
+		SPAN_HEAR("You hear a snap!"),
+	)
+	playsound(src, 'sound/effects/snap.ogg', 50, TRUE)
+	qdel(src)
+	return COMPONENT_THROW_HIT_TERMINATE
 
 /obj/item/toy/snappop/Crossed(atom/movable/H as mob|obj)
 	. = ..()
@@ -351,14 +355,12 @@
 	item_state = "sunflower"
 	var/empty = 0
 	slot_flags = SLOT_HOLSTER
+	force = 0
 
 /obj/item/toy/waterflower/Initialize(mapload)
 	. = ..()
 	var/datum/reagents/R = create_reagents(10)
 	R.add_reagent("water", 10)
-
-/obj/item/toy/waterflower/attack(mob/living/carbon/human/M as mob, mob/user as mob)
-	return
 
 /obj/item/toy/waterflower/afterattack(atom/A as mob|obj, mob/user as mob)
 
@@ -384,7 +386,7 @@
 
 		var/obj/effect/decal/D = new/obj/effect/decal/(get_turf(src))
 		D.name = "water"
-		D.icon = 'icons/obj/chemical.dmi'
+		D.icon = 'icons/obj/medical/chemical.dmi'
 		D.icon_state = "chempuff"
 		D.create_reagents(5)
 		src.reagents.trans_to_obj(D, 1)
@@ -776,15 +778,14 @@
 	var/bitesound = 'sound/weapons/bite.ogg'
 
 // Attack mob
-/obj/item/toy/plushie/carp/attack(mob/M as mob, mob/user as mob)
-	playsound(loc, bitesound, 20, 1)	// Play bite sound in local area
-	return ..()
+/obj/item/toy/plushie/carp/attack_mob(mob/target, mob/user, clickchain_flags, list/params, mult, target_zone, intent)
+	. = ..()
+	playsound(src, bitesound, 20, 1)	// Play bite sound in local area
 
 // Attack self
 /obj/item/toy/plushie/carp/attack_self(mob/user as mob)
-	playsound(src.loc, bitesound, 20, 1)
+	playsound(src, bitesound, 20, 1)
 	return ..()
-
 
 /obj/random/carp_plushie
 	name = "Random Carp Plushie"
@@ -1302,8 +1303,8 @@
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "cultblade"
 	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items/lefthand_melee.dmi',
-		slot_r_hand_str = 'icons/mob/items/righthand_melee.dmi',
+		SLOT_ID_LEFT_HAND = 'icons/mob/items/lefthand_melee.dmi',
+		SLOT_ID_RIGHT_HAND = 'icons/mob/items/righthand_melee.dmi',
 		)
 	w_class = ITEMSIZE_LARGE
 	attack_verb = list("attacked", "slashed", "stabbed", "poked")
@@ -1526,7 +1527,7 @@
 	icon_state = "tinyxmastree"
 	w_class = ITEMSIZE_TINY
 	force = 1
-	throwforce = 1
+	throw_force = 1
 
 //Dakimakuras, ported from Main.
 
@@ -1644,7 +1645,7 @@
 
 /obj/item/checker
 	name = "Checker Piece"
-	icon = 'icons/mob/robots_vr.dmi'
+	icon = 'icons/mob/robots.dmi'
 	icon_state = "zoomba-combat-shield"
 	desc = "Some sort of novelty checker piece."
 

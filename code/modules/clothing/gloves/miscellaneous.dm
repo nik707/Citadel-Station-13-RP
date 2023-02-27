@@ -2,7 +2,7 @@
 	desc = "Regal blue gloves, with a nice gold trim. Swanky."
 	name = "Facility Director's gloves"
 	icon_state = "captain"
-	item_state_slots = list(slot_r_hand_str = "blue", slot_l_hand_str = "blue")
+	item_state_slots = list(SLOT_ID_RIGHT_HAND = "blue", SLOT_ID_LEFT_HAND = "blue")
 
 /obj/item/clothing/gloves/cyborg
 	desc = "beep boop borp"
@@ -58,7 +58,7 @@
 	name = "sterile gloves"
 	desc = "Sterile gloves."
 	icon_state = "latex"
-	item_state_slots = list(slot_r_hand_str = "white", slot_l_hand_str = "white")
+	item_state_slots = list(SLOT_ID_RIGHT_HAND = "white", SLOT_ID_LEFT_HAND = "white")
 	siemens_coefficient = 1.0 //thin latex gloves, much more conductive than fabric gloves (basically a capacitor for AC)
 	permeability_coefficient = 0.01
 	germ_level = 0
@@ -86,7 +86,7 @@
 	desc = "These leather work gloves protect against thorns, barbs, prickles, spikes and other harmful objects of floral origin."
 	name = "botanist's leather gloves"
 	icon_state = "leather"
-	item_state_slots = list(slot_r_hand_str = "lightbrown", slot_l_hand_str = "lightbrown")
+	item_state_slots = list(SLOT_ID_RIGHT_HAND = "lightbrown", SLOT_ID_LEFT_HAND = "lightbrown")
 	permeability_coefficient = 0.05
 	siemens_coefficient = 0.75 //thick work gloves
 	drop_sound = 'sound/items/drop/leather.ogg'
@@ -115,7 +115,7 @@
 	name = "insulated gauntlets"
 	icon_state = "gloves-vox"
 	item_state = "gloves-vox"
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	siemens_coefficient = 0
 	permeability_coefficient = 0.05
 	species_restricted = list(SPECIES_VOX)
@@ -328,7 +328,7 @@
 
 /obj/item/clothing/gloves/fingerless/pugilist/rapid/Initialize(mapload)
 	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, GLOVE_TRAIT)
+	ADD_TRAIT(src, TRAIT_ITEM_NODROP, GLOVE_TRAIT)
 
 /obj/item/clothing/gloves/fingerless/pugilist/rapid/Touch(atom/target, proximity = TRUE)
 	if(!isliving(target))
@@ -610,6 +610,14 @@
 	min_distance = 2
 	skill_mod = -1
 */
+
+/obj/item/clothing/gloves/goliath
+	name = "goliath hide gloves"
+	desc = "Goliath hide is well recognized among the Scori for its resistance to heat and durability. Items fashioned out of it, like these hide gloves, are frequently used by craftsmen."
+	icon_state = "goligloves"
+	permeability_coefficient = 0.05
+	drop_sound = 'sound/items/drop/leather.ogg'
+	pickup_sound = 'sound/items/pickup/leather.ogg'
 
 /obj/item/clothing/gloves/bracer
 	name = "bone bracers"

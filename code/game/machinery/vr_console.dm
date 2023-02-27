@@ -1,7 +1,7 @@
 /obj/machinery/vr_sleeper
 	name = "virtual reality sleeper"
 	desc = "A fancy bed with built-in sensory I/O ports and connectors to interface users' minds with their bodies in virtual reality."
-	icon = 'icons/obj/Cryogenic2.dmi'
+	icon = 'icons/obj/medical/cryogenic2.dmi'
 	icon_state = "syndipod_0"
 	density = TRUE
 	anchored = TRUE
@@ -206,7 +206,7 @@
 
 		avatar = new(S, SPECIES_VR)
 		// If the user has a non-default (Human) bodyshape, make it match theirs.
-		if(occupant.species.name != SPECIES_PROMETHEAN && occupant.species.name != SPECIES_HUMAN)
+		if(occupant.species.get_species_id() != SPECIES_ID_PROMETHEAN && occupant.species.get_species_id() != SPECIES_ID_HUMAN)
 			avatar.shapeshifter_change_shape(occupant.species.name)
 		avatar.forceMove(get_turf(S))			// Put the mob on the landmark, instead of inside it
 		avatar.Sleeping(1)

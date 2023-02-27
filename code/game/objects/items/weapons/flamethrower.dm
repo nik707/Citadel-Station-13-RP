@@ -4,12 +4,12 @@
 	icon = 'icons/obj/flamethrower.dmi'
 	icon_state = "flamethrowerbase"
 	item_icons = list(
-			slot_l_hand_str = 'icons/mob/items/lefthand_guns.dmi',
-			slot_r_hand_str = 'icons/mob/items/righthand_guns.dmi',
+			SLOT_ID_LEFT_HAND = 'icons/mob/items/lefthand_guns.dmi',
+			SLOT_ID_RIGHT_HAND = 'icons/mob/items/righthand_guns.dmi',
 			)
 	item_state = "flamethrower_0"
 	force = 3.0
-	throwforce = 10.0
+	throw_force = 10.0
 	throw_speed = 1
 	throw_range = 5
 	w_class = ITEMSIZE_NORMAL
@@ -44,16 +44,21 @@
 		location.hotspot_expose(700, 2)
 
 /obj/item/flamethrower/update_icon()
-	overlays.Cut()
+	cut_overlays()
+
+	var/list/overlays_to_add = list()
 	if(igniter)
-		overlays += "+igniter[status]"
+		overlays_to_add += "+igniter[status]"
 	if(ptank)
-		overlays += "+ptank"
+		overlays_to_add += "+ptank"
 	if(lit)
-		overlays += "+lit"
+		overlays_to_add += "+lit"
 		item_state = "flamethrower_1"
 	else
 		item_state = "flamethrower_0"
+
+	add_overlay(overlays_to_add)
+
 	return
 
 /obj/item/flamethrower/afterattack(atom/target, mob/user, proximity)

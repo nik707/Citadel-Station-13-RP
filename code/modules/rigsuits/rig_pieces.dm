@@ -4,30 +4,13 @@
 
 /obj/item/clothing/head/helmet/space/rig
 	name = "helmet"
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	clothing_flags = THICKMATERIAL | ALLOW_SURVIVALFOOD | EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB | ALLOWINTERNALS
 	flags_inv      = HIDEEARS|HIDEEYES|HIDEFACE|BLOCKHAIR
 	body_parts_covered = HEAD|FACE|EYES
 	heat_protection    = HEAD|FACE|EYES
 	cold_protection    = HEAD|FACE|EYES
 	brightness_on = 4
-	sprite_sheets = list(
-		SPECIES_AKULA       = 'icons/mob/clothing/species/akula/helmet.dmi',
-		SPECIES_NEVREAN     = 'icons/mob/clothing/species/nevrean/helmet.dmi',
-		SPECIES_PHORONOID   = 'icons/mob/clothing/species/phoronoid/head.dmi',
-		SPECIES_PROMETHEAN  = 'icons/mob/clothing/species/skrell/helmet.dmi',
-		SPECIES_SERGAL      = 'icons/mob/clothing/species/sergal/helmet.dmi',
-		SPECIES_SKRELL      = 'icons/mob/clothing/species/skrell/helmet.dmi',
-		SPECIES_TAJ         = 'icons/mob/clothing/species/tajaran/helmet.dmi',
-		SPECIES_TESHARI     = 'icons/mob/clothing/species/teshari/head.dmi',
-		SPECIES_UNATHI      = 'icons/mob/clothing/species/unathi/helmet.dmi',
-		SPECIES_VOX         = 'icons/mob/clothing/species/vox/head.dmi',
-		SPECIES_VULPKANIN   = 'icons/mob/clothing/species/vulpkanin/helmet.dmi',
-		SPECIES_XENOHYBRID  = 'icons/mob/clothing/species/unathi/helmet.dmi',
-		SPECIES_ZADDAT      = 'icons/mob/clothing/species/zaddat/head.dmi',
-		SPECIES_ZORREN_FLAT = 'icons/mob/clothing/species/fennec/helmet.dmi',
-		SPECIES_ZORREN_HIGH = 'icons/mob/clothing/species/fox/helmet.dmi',
-		)
 
 	max_pressure_protection = null
 	min_pressure_protection = null
@@ -49,6 +32,7 @@
 		SPECIES_TAJ,
 		SPECIES_TESHARI,
 		SPECIES_UNATHI,
+		SPECIES_UNATHI_DIGI,
 		SPECIES_VASILISSAN,
 		SPECIES_VOX,
 		SPECIES_VULPKANIN,
@@ -61,7 +45,7 @@
 /obj/item/clothing/gloves/gauntlets/rig
 	name = "gauntlets"
 	clothing_flags = THICKMATERIAL | EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	body_parts_covered = HANDS
 	heat_protection    = HANDS
 	cold_protection    = HANDS
@@ -82,6 +66,7 @@
 		SPECIES_TAJ,
 		SPECIES_TESHARI,
 		SPECIES_UNATHI,
+		SPECIES_UNATHI_DIGI,
 		SPECIES_VASILISSAN,
 		SPECIES_VOX,
 		SPECIES_VULPKANIN,
@@ -93,20 +78,13 @@
 
 /obj/item/clothing/shoes/magboots/rig
 	name = "boots"
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	clothing_flags = EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
 	body_parts_covered = FEET
 	cold_protection    = FEET
 	heat_protection    = FEET
 
 	icon_base = null
-	sprite_sheets = list(
-		SPECIES_TESHARI   = 'icons/mob/clothing/species/teshari/shoes.dmi',
-		SPECIES_VOX       = 'icons/mob/clothing/species/vox/shoes.dmi',
-		SPECIES_WEREBEAST = 'icons/mob/clothing/species/werebeast/feet.dmi',
-		SPECIES_ZADDAT    = 'icons/mob/clothing/species/zaddat/shoes.dmi',
-		) //Zaddat Engi RIG appearance is unique. List inherited from code\modules\clothing\clothing.dm
-
 	force = 5 // if you're kicking someone with something meant to keep you locked on a hunk of metal...
 
 	species_restricted = list(
@@ -125,6 +103,7 @@
 		SPECIES_TAJ,
 		SPECIES_TESHARI,
 		SPECIES_UNATHI,
+		SPECIES_UNATHI_DIGI,
 		SPECIES_VASILISSAN,
 		SPECIES_VOX,
 		SPECIES_VULPKANIN,
@@ -142,7 +121,7 @@
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	clothing_flags     = THICKMATERIAL | EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
 	cold_protection    = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
-	flags              = PHORONGUARD
+	atom_flags              = PHORONGUARD
 	flags_inv          = HIDEJUMPSUIT|HIDETAIL
 	heat_protection    = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
@@ -158,24 +137,6 @@
 	var/obj/item/material/knife/tacknife
 	max_pressure_protection = null
 	min_pressure_protection = null
-
-	sprite_sheets = list(
-		SPECIES_AKULA       = 'icons/mob/clothing/species/akula/suits.dmi',
-		SPECIES_NEVREAN     = 'icons/mob/clothing/species/nevrean/suits.dmi',
-		SPECIES_PHORONOID   = 'icons/mob/clothing/species/phoronoid/suits.dmi',
-		SPECIES_PROMETHEAN  = 'icons/mob/clothing/species/skrell/suits.dmi',
-		SPECIES_SERGAL      = 'icons/mob/clothing/species/sergal/suits.dmi',
-		SPECIES_SKRELL      = 'icons/mob/clothing/species/skrell/suits.dmi',
-		SPECIES_TAJ         = 'icons/mob/clothing/species/tajaran/suits.dmi',
-		SPECIES_TESHARI     = 'icons/mob/clothing/species/teshari/suits.dmi',
-		SPECIES_UNATHI      = 'icons/mob/clothing/species/unathi/suits.dmi',
-		SPECIES_VOX         = 'icons/mob/clothing/species/vox/suits.dmi',
-		SPECIES_VULPKANIN   = 'icons/mob/clothing/species/vulpkanin/suits.dmi',
-		SPECIES_XENOHYBRID  = 'icons/mob/clothing/species/unathi/suits.dmi',
-		SPECIES_ZADDAT      = 'icons/mob/clothing/species/zaddat/suits.dmi',
-		SPECIES_ZORREN_FLAT = 'icons/mob/clothing/species/fennec/suits.dmi',
-		SPECIES_ZORREN_HIGH = 'icons/mob/clothing/species/fox/suits.dmi',
-		)
 
 	species_restricted = list(
 		SPECIES_AKULA,
@@ -193,6 +154,7 @@
 		SPECIES_TAJ,
 		SPECIES_TESHARI,
 		SPECIES_UNATHI,
+		SPECIES_UNATHI_DIGI,
 		SPECIES_VASILISSAN,
 		SPECIES_VOX,
 		SPECIES_VULPKANIN,
@@ -254,7 +216,7 @@
 /obj/item/clothing/head/lightrig
 	name = "mask"
 	clothing_flags = THICKMATERIAL | ALLOWINTERNALS | EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	body_parts_covered = HEAD|FACE|EYES
 	heat_protection    = HEAD|FACE|EYES
 	cold_protection    = HEAD|FACE|EYES
@@ -264,14 +226,14 @@
 	allowed = list(/obj/item/flashlight)
 	flags_inv = HIDEJUMPSUIT
 	clothing_flags = THICKMATERIAL | EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	heat_protection    = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	cold_protection    = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 
 /obj/item/clothing/shoes/lightrig
 	name = "boots"
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	clothing_flags = EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
 	species_restricted = null
 	body_parts_covered = FEET
@@ -281,7 +243,7 @@
 /obj/item/clothing/gloves/gauntlets/lightrig
 	name = "gloves"
 	clothing_flags = THICKMATERIAL | EQUIP_IGNORE_BELTLINK | EQUIP_IGNORE_DELIMB
-	flags = PHORONGUARD
+	atom_flags = PHORONGUARD
 	species_restricted = null
 	body_parts_covered = HANDS
 	heat_protection    = HANDS

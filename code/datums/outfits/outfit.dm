@@ -5,13 +5,14 @@
 		if(initial(O.abstract_type) == path)
 			continue
 		. += new path
-	sortTim(., /proc/cmp_name_asc)
+	tim_sort(., /proc/cmp_name_asc)
 
 /datum/outfit
+	/// Abstract type - set to self type for abstract outfits.
+	abstract_type = /datum/outfit
+
 	/// the outfit's name
 	var/name = "Naked"
-	/// abstract type - set to self type for abstract outfits.
-	var/abstract_type = /datum/outfit
 
 	var/uniform = null
 	var/suit = null
@@ -167,7 +168,7 @@
 		pda.name = "PDA-[H.real_name] ([assignment])"
 		if(H.client.prefs.ringtone) // if null we use the job default
 			pda.ringtone = H.client.prefs.ringtone
-		sortTim(GLOB.PDAs, /proc/cmp_name_asc)
+		tim_sort(GLOB.PDAs, /proc/cmp_name_asc)
 		return pda
 
 /datum/outfit/dd_SortValue()
@@ -186,7 +187,7 @@
 	l_pocket = /obj/item/ammo_magazine/m95
 	l_hand = /obj/item/ammo_magazine/m95
 	r_hand = /obj/item/ammo_magazine/m95
-	back = /obj/item/gun/projectile/automatic/battlerifle
+	back = /obj/item/gun/ballistic/automatic/battlerifle
 	backpack_contents = list(/obj/item/storage/box = 1)
 	abstract_type = /datum/outfit/wizard
 	head = /obj/item/clothing/head/helmet/combat/JSDF
@@ -195,7 +196,7 @@
 
 /datum/outfit/JSDF/Marine/equip_id(mob/living/carbon/human/H)
 	var/obj/item/card/id/C = ..()
-	C.name = "[H.real_name]'s military ID Card"
+	C.name = "[H?.real_name]'s military ID Card"
 	C.icon_state = "lifetime"
 	C.assignment = "JSDF"
 	C.registered_name = H.real_name
@@ -207,7 +208,7 @@
 	shoes = /obj/item/clothing/shoes/boots/jackboots
 	uniform = /obj/item/clothing/under/oricon/mildress/marine/command
 	back = /obj/item/storage/backpack/satchel
-	belt = /obj/item/gun/projectile/revolver/consul
+	belt = /obj/item/gun/ballistic/revolver/consul
 	l_pocket = /obj/item/ammo_magazine/s44
 	r_pocket = /obj/item/ammo_magazine/s44
 	r_hand = /obj/item/clothing/accessory/holster/hip

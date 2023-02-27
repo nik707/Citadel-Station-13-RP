@@ -31,7 +31,7 @@
 	var/eattiles = FALSE
 	var/maketiles = FALSE
 	var/targetdirection = null
-	var/floor_build_type = /decl/flooring/tiling // Basic steel floor.
+	var/floor_build_type = /singleton/flooring/tiling // Basic steel floor.
 	var/toolbox = /obj/item/storage/toolbox/mechanical
 	skin = "blue" // Blue Toolbox is the default
 
@@ -411,7 +411,7 @@
 	base_icon_state = "toolbox"
 	skin = "blue"
 	force = 3
-	throwforce = 10
+	throw_force = 10
 	throw_speed = 2
 	throw_range = 5
 	w_class = ITEMSIZE_NORMAL

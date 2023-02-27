@@ -22,6 +22,13 @@
 
 	if(old != health)
 		update_hud_med_all()
+	
+// todo: sort file and move to damage_procs
+
+/mob/living/carbon/human/afflict_radiation(amt, run_armor, damage_zone)
+	if(species)
+		amt = amt * species.radiation_mod
+	return ..()
 
 /mob/living/carbon/human/adjustBrainLoss(var/amount)
 
@@ -33,7 +40,7 @@
 			if(amount > 0)
 				sponge.take_damage(amount)
 			else
-				sponge.heal_damage_i(amount, can_revive = TRUE)
+				sponge.heal_damage_i(-amount, can_revive = TRUE)
 			brainloss = sponge.damage
 		else
 			brainloss = 200
@@ -195,17 +202,17 @@
 	update_hud_med_all()
 
 /mob/living/carbon/human/Stun(amount)
-	if(HULK in mutations)
+	if(MUTATION_HULK in mutations)
 		return
 	..()
 
 /mob/living/carbon/human/Weaken(amount)
-	if(HULK in mutations)
+	if(MUTATION_HULK in mutations)
 		return
 	..()
 
-/mob/living/carbon/human/Paralyse(amount)
-	if(HULK in mutations)
+/mob/living/carbon/human/Unconscious(amount)
+	if(MUTATION_HULK in mutations)
 		return
 	// Notify our AI if they can now control the suit.
 	if(wearing_rig && !stat && paralysis < amount) //We are passing out right this second.
@@ -213,13 +220,13 @@
 	..()
 
 /mob/living/carbon/human/proc/Stasis(amount)
-	if((species.flags & NO_SCAN) || isSynthetic())
+	if((species.species_flags & NO_SCAN) || isSynthetic())
 		in_stasis = 0
 	else
 		in_stasis = amount
 
 /mob/living/carbon/human/proc/getStasis()
-	if((species.flags & NO_SCAN) || isSynthetic())
+	if((species.species_flags & NO_SCAN) || isSynthetic())
 		return 0
 
 	return in_stasis
@@ -233,12 +240,12 @@
 	return 0
 
 /mob/living/carbon/human/getCloneLoss()
-	if((species.flags & NO_SCAN) || isSynthetic())
+	if((species.species_flags & NO_SCAN) || isSynthetic())
 		cloneloss = 0
 	return ..()
 
 /mob/living/carbon/human/setCloneLoss(var/amount)
-	if((species.flags & NO_SCAN) || isSynthetic())
+	if((species.species_flags & NO_SCAN) || isSynthetic())
 		cloneloss = 0
 	else
 		..()
@@ -246,7 +253,7 @@
 /mob/living/carbon/human/adjustCloneLoss(var/amount)
 	..()
 
-	if((species.flags & NO_SCAN) || isSynthetic())
+	if((species.species_flags & NO_SCAN) || isSynthetic())
 		cloneloss = 0
 		return
 
@@ -298,19 +305,19 @@
 		..()
 
 /mob/living/carbon/human/getToxLoss()
-	if(species.flags & NO_POISON)
+	if(species.species_flags & NO_POISON)
 		toxloss = 0
 	return ..()
 
 /mob/living/carbon/human/adjustToxLoss(var/amount)
-	if(species.flags & NO_POISON)
+	if(species.species_flags & NO_POISON)
 		toxloss = 0
 	else
 		amount = amount*species.toxins_mod
 		..(amount)
 
 /mob/living/carbon/human/setToxLoss(var/amount)
-	if(species.flags & NO_POISON)
+	if(species.species_flags & NO_POISON)
 		toxloss = 0
 	else
 		..()

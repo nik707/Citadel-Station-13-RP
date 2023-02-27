@@ -1,6 +1,6 @@
 /mob/living/carbon/human/emote(var/act,var/m_type=1,var/message = null)
 	var/param = null
-	var/datum/gender/T = gender_datums[get_visible_gender()]
+	var/datum/gender/T = GLOB.gender_datums[get_visible_gender()]
 	if(istype(src, /mob/living/carbon/human/dummy))
 		return
 	if (findtext(act, "-", 1, null))
@@ -8,8 +8,8 @@
 		param = copytext(act, t1 + 1, length(act) + 1)
 		act = copytext(act, 1, t1)
 
-	if(findtext(act,"s",-1) && !findtext(act,"_",-2))//Removes ending s's unless they are prefixed with a '_'
-		act = copytext(act,1,length(act))
+	//if(findtext(act,"s",-1) && !findtext(act,"_",-2))//Removes ending s's unless they are prefixed with a '_'
+	//	act = copytext(act,1,length(act))
 
 	var/muzzled = is_muzzled()
 	//var/m_type = 1
@@ -33,7 +33,8 @@
 		//Machine-only emotes
 		if("ping", "beep", "buzz", "yes", "ye", "no", "dwoop", "scary", "rcough", "rsneeze", "honk", "buzz2", "warn", "chime", "startup", "shutdown", "error", "die")
 
-			if(!isSynthetic())
+			var/obj/item/organ/o = internal_organs_by_name[O_VOICE]
+			if(!isSynthetic() && (!o || !(o.robotic >= ORGAN_ASSISTED)))
 				to_chat(src, "<span class='warning'>You are not a synthetic.</span>")
 				return
 
@@ -121,7 +122,7 @@
 
 		// SHRIEK VOXXY ONLY
 		if ("shriekloud")
-			if(src.species.name != SPECIES_VOX)
+			if(src.species.get_species_id() != SPECIES_ID_VOX)
 				to_chat(src, "<span class='warning'>You aren't ear piercingly vocal enough!</span>")
 				return
 			playsound(src.loc, 'sound/voice/shrieksneeze.ogg', 50, 0)
@@ -129,7 +130,7 @@
 			m_type = 1
 
 		if ("shriekshort")
-			if(src.species.name != SPECIES_VOX)
+			if(src.species.get_species_id() != SPECIES_ID_VOX)
 				to_chat(src, "<span class='warning'>You aren't noisy enough!</span>")
 				return
 			playsound(src.loc, 'sound/voice/shriekcough.ogg', 50, 0)
@@ -138,13 +139,88 @@
 
 		// SQUID GAMES
 		if ("achime")
-			if(src.species.name != SPECIES_ADHERENT)
+			if(src.species.get_species_id() != SPECIES_ID_ADHERENT)
 				to_chat(src, "<span class='warning'>You aren't floaty enough!</span>")
 				return
 			playsound(src.loc, 'sound/machines/achime.ogg', 50, 0)
 			message = "chimes!"
 			m_type = 1
 
+		//Xenomorph Hybrid
+		if("xhiss")
+			if(src.species.get_species_id() != SPECIES_ID_XENOHYBRID)
+				to_chat(src, "<span class='warning'>You aren't alien enough!</span>")
+				return
+			playsound(src.loc, 'sound/voice/xenos/alien_hiss3.ogg', 50, 0)
+			message = "hisses!"
+			m_type = 2
+
+		if("xroar")
+			if(src.species.get_species_id() != SPECIES_ID_XENOHYBRID)
+				to_chat(src, "<span class='warning'>You aren't alien enough!</span>")
+				return
+			playsound(src.loc, 'sound/voice/xenos/alien_roar1.ogg', 50, 0)
+			message = "roars!"
+			m_type = 2
+
+		if("xgrowl")
+			if(src.species.get_species_id() != SPECIES_ID_XENOHYBRID)
+				to_chat(src, "<span class='warning'>You aren't alien enough!</span>")
+				return
+			playsound(src.loc, 'sound/voice/xenos/alien_growl1.ogg', 50, 0)
+			message = "growls!"
+			m_type = 2
+
+		if("xkiss")
+			if(src.species.get_species_id() != SPECIES_ID_XENOHYBRID)
+				to_chat(src, "<span class='warning'>You aren't alien enough!</span>")
+				return
+			var/M = null
+			if (param)
+				for (var/mob/A in view(1,src.loc))
+					if (param == A.name)
+						M = A
+						break
+				if (!M)
+					param = null
+
+				if (param)
+					message = "extends their inner jaw outwards giving [param] a kiss."
+			m_type = 1
+
+		if("kiss")
+			var/next_to_target = FALSE
+			var/M = null
+			if (param)
+				for (var/mob/A in view(null, null))
+					if (param == A.name)
+						M = A
+						if(src.Adjacent(A))
+							next_to_target = TRUE
+						break
+				if (!M)
+					param = null
+
+				if (param)
+					var/distance_verb = next_to_target ? "kisses" : "blows a kiss at"
+					message = "[distance_verb] [param]."
+			else
+				message = "makes a kissing mouth."
+			m_type = 1
+
+		if("smooch")
+			if (param)
+				var/M = null
+				for (var/mob/A in view(1,src.loc))
+					if (param == A.name)
+						M = A
+						break
+				if (!M)
+					param = null
+
+				if (param)
+					message = "smooches [param]."
+			m_type = 1
 
 		if ("blink")
 			message = "blinks."
@@ -234,10 +310,14 @@
 		if ("clap")
 			if (!src.restrained())
 				message = "claps."
-				playsound(src.loc, 'sound/misc/clapping.ogg')
-				m_type = 2
-				if HAS_TRAIT_FROM(src, TRAIT_MUTE, TRAIT_MIME)
-					m_type = 1
+				var/use_sound
+				use_sound = pick('sound/misc/clapping.ogg','sound/voice/clap2.ogg','sound/voice/clap3.ogg','sound/voice/clap4.ogg')
+				playsound(src.loc, use_sound, 50, 0)
+
+		if("golfclap")
+			if (!src.restrained())
+				message = "claps very slowly."
+				playsound(src.loc, 'sound/voice/golfclap.ogg', 50, 0)
 
 		if ("flap")
 			if (!src.restrained())
@@ -688,7 +768,7 @@
 					m_type = 1
 
 		if ("collapse")
-			Paralyse(2)
+			Unconscious(2)
 			message = "collapses!"
 			m_type = 2
 			if HAS_TRAIT_FROM(src, TRAIT_MUTE, TRAIT_MIME)
@@ -916,7 +996,7 @@
 	set desc = "Sets a description which will be shown when someone examines you."
 	set category = "IC"
 
-	var/datum/gender/T = gender_datums[get_visible_gender()]
+	var/datum/gender/T = GLOB.gender_datums[get_visible_gender()]
 
 	pose =  sanitize(input(usr, "This is [src]. [T.he]...", "Pose", null)  as text)
 
@@ -1062,9 +1142,26 @@
 				to_chat(src, "<span class='warning'>You can't *flip in your current state!</span>")
 				return 1
 			else
-				src.SpinAnimation(7,1)
-				// message = "does a flip!"
 				m_type = 1
+				if(!spam_flag)
+					src.SpinAnimation(7,1)
+					message = "does a flip!"
+					spam_flag = TRUE
+					addtimer(CALLBACK(src, .proc/spam_flag_false), 18)
+				else
+					if(prob(30)) // Little known fact: HRP is /tg/ + 10
+						src.Weaken(2)
+						if(prob(50))
+							src.adjustBruteLoss(1)
+							message = "attempts to do a flip and falls on their face. Ouch!"
+						else
+							message = "attempts to do a flip and falls over, what a doofus!"
+					else
+						src.SpinAnimation(7,1)
+						message = "lands another flip. Smooth!"
+						spam_flag = TRUE
+						addtimer(CALLBACK(src, .proc/spam_flag_false), 18)
+
 // New emotes below this line
 		if ("purr")
 			message = "purrs softly."

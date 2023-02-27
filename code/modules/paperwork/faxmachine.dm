@@ -1,5 +1,5 @@
 var/list/obj/machinery/photocopier/faxmachine/allfaxes = list()
-var/list/admin_departments = list("[GLOB.using_map.boss_name]", "Virgo-Prime Governmental Authority", "Supply")
+var/list/admin_departments = list("[GLOB.using_map.boss_name]", "Hadii's Folly Governmental Authority", "Supply")
 var/list/alldepartments = list()
 
 var/list/adminfaxes = list()	//cache for faxes that have been sent to admins
@@ -206,7 +206,7 @@ var/list/adminfaxes = list()	//cache for faxes that have been sent to admins
 	msg += "(<a href='?_src_=holder;FaxReply=\ref[sender];originfax=\ref[src];replyorigin=[reply_type]'>REPLY</a>)</b>: "
 	msg += "Receiving '[sent.name]' via secure connection ... <a href='?_src_=holder;AdminFaxView=\ref[sent]'>view message</a></span>"
 
-	for(var/client/C in admins)
+	for(var/client/C in GLOB.admins)
 		if(check_rights((R_ADMIN|R_MOD),0,C))
 			to_chat(C, msg)
 			SEND_SOUND(C, sound('sound/machines/printer.ogg'))

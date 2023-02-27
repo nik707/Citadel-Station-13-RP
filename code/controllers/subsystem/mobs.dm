@@ -18,7 +18,7 @@ SUBSYSTEM_DEF(mobs)
 	var/slept_mobs = 0
 
 /datum/controller/subsystem/mobs/stat_entry()
-	..("P: [global.GLOB.mob_list.len] | S: [slept_mobs]")
+	return ..() + " P: [global.GLOB.mob_list.len] | S: [slept_mobs]"
 
 /datum/controller/subsystem/mobs/fire(resumed = 0)
 	var/list/busy_z_levels = src.busy_z_levels
@@ -27,7 +27,7 @@ SUBSYSTEM_DEF(mobs)
 		slept_mobs = 0
 		src.currentrun = GLOB.mob_list.Copy()
 		busy_z_levels.Cut()
-		for(var/played_mob in player_list)
+		for(var/played_mob in GLOB.player_list)
 			if(!played_mob || isobserver(played_mob))
 				continue
 			var/mob/pm = played_mob

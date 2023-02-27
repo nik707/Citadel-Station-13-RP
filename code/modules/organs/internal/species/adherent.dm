@@ -63,7 +63,7 @@
 
 /obj/item/organ/internal/powered/jets/Initialize(mapload)
 	. = ..()
-	//verbs |= /obj/item/organ/internal/powered/jets/proc/activatej
+	//add_obj_verb(src, /obj/item/organ/internal/powered/jets/proc/activatej)
 
 /obj/item/organ/internal/powered/jets/ui_action_click()
 	activatej()
@@ -80,7 +80,7 @@
 	if(C.nutrition < 25 && !C.flying) //Don't have any food in you?" You can't fly.
 		to_chat(C, SPAN_NOTICE("You lack the energy to fly."))
 		return
-	owner.pass_flags ^= PASSTABLE
+	owner.pass_flags ^= ATOM_PASS_TABLE
 	C.flying = !C.flying
 	C.update_floating()
 	to_chat(C, SPAN_NOTICE("You have [C.flying?"started":"stopped"] flying."))
@@ -104,8 +104,8 @@
 
 /obj/item/organ/internal/powered/float/Initialize(mapload)
 	. = ..()
-	//verbs |= /obj/item/organ/internal/powered/float/proc/flying_toggle
-	verbs |= /obj/item/organ/internal/powered/float/proc/hover
+	//add_obj_verb(src, /obj/item/organ/internal/powered/float/proc/flying_toggle)
+	add_obj_verb(src, /obj/item/organ/internal/powered/float/proc/hover)
 
 /obj/item/organ/internal/powered/float/ui_action_click()
 	hover()
@@ -121,7 +121,7 @@
 
 /obj/item/organ/internal/eyes/adherent/Initialize(mapload)
 	. = ..()
-	verbs |= /obj/item/organ/internal/eyes/proc/change_eye_color
+	add_obj_verb(src, /obj/item/organ/internal/eyes/proc/change_eye_color)
 
 
 /obj/item/organ/internal/cell/adherent
@@ -151,7 +151,7 @@
 
 /obj/item/organ/internal/powered/cooling_fins/Initialize(mapload)
 	. = ..()
-	verbs |= /obj/item/organ/internal/powered/cooling_fins/proc/activatecf
+	add_obj_verb(src, /obj/item/organ/internal/powered/cooling_fins/proc/activatecf)
 
 /obj/item/organ/internal/powered/cooling_fins/ui_action_click()
 	activatecf()
@@ -188,7 +188,7 @@
 	if(C.nutrition < 25 && !C.flying) //Don't have any food in you?" You can't fly.
 		to_chat(C, "<span class='notice'>You lack the energy to fly.</span>")
 		return
-	owner.pass_flags ^= PASSTABLE
+	owner.pass_flags ^= ATOM_PASS_TABLE
 	C.flying = !C.flying
 	C.update_floating()
 	to_chat(C, "<span class='notice'>You have [C.flying?"started":"stopped"] flying.</span>")*/

@@ -87,6 +87,11 @@
 	req_access = list(access_explorer) //Old Exploration needs fixing up
 	departments = list("Exploration", "No Change")
 
+/obj/machinery/suit_cycler/pathfinder
+	name = "Pathfinder suit cycler"
+	model_text = "Pathfinder"
+	req_access = list(access_pathfinder)
+	departments = list("Pathfinder", "No Change")
 
 /obj/machinery/suit_cycler/pilot
 	name = "Pilot suit cycler"
@@ -186,7 +191,7 @@
 	else if(I.is_screwdriver())
 
 		panel_open = !panel_open
-		playsound(src, I.usesound, 50, 1)
+		playsound(src, I.tool_sound, 50, 1)
 		to_chat(user, "You [panel_open ?  "open" : "close"] the maintenance panel.")
 		updateUsrDialog()
 		return
@@ -402,12 +407,13 @@
 	irradiating--
 
 	if(occupant)
-		if(prob(radiation_level*2)) occupant.emote("scream")
+		if(prob(radiation_level*2))
+			occupant.emote("scream")
 		if(radiation_level > 2)
 			occupant.take_organ_damage(0,radiation_level*2 + rand(1,3))
 		if(radiation_level > 1)
 			occupant.take_organ_damage(0,radiation_level + rand(1,3))
-		occupant.apply_effect(radiation_level*10, IRRADIATE)
+		occupant.apply_effect(radiation_level * 200, IRRADIATE)
 
 /obj/machinery/suit_cycler/proc/finished_job()
 	var/turf/T = get_turf(src)
@@ -529,6 +535,9 @@
 		if("Old Exploration")
 			parent_helmet = /obj/item/clothing/head/helmet/space/void/exploration/alt
 			parent_suit = /obj/item/clothing/suit/space/void/exploration/alt
+		if("Pathfinder")
+			parent_helmet = /obj/item/clothing/head/helmet/space/void/exploration/pathfinder
+			parent_suit = /obj/item/clothing/suit/space/void/exploration/pathfinder
 		if("Pilot")
 			parent_helmet = /obj/item/clothing/head/helmet/space/void/pilot
 			parent_suit = /obj/item/clothing/suit/space/void/pilot
@@ -680,3 +689,10 @@
 	model_text = "Talon captain"
 	req_access = list(access_talon)
 	departments = list("Talon Officer","No Change")
+
+//Pirate
+/obj/machinery/suit_cycler/pirate
+	name = "Black Market suit cycler"
+	model_text = "Pirate"
+	req_access = list(access_pirate)
+	departments = list("No Change")

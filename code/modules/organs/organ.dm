@@ -1,36 +1,35 @@
 /obj/item/organ/Initialize(mapload, internal)
-	. = ..()
-	var/mob/living/holder = loc
+	. = ..(mapload)
 	create_reagents(5)
 
-	if(isliving(holder))
-		src.owner = holder
-		src.w_class = max(src.w_class + mob_size_difference(holder.mob_size, MOB_MEDIUM), 1) //smaller mobs have smaller organs.
+	if(isliving(loc))
+		owner = loc
+		w_class = max(src.w_class + mob_size_difference(owner.mob_size, MOB_MEDIUM), 1) //smaller mobs have smaller organs.
 		if(internal)
-			if(!LAZYLEN(holder.internal_organs))
-				holder.internal_organs = list()
-			if(!LAZYLEN(holder.internal_organs_by_name))
-				holder.internal_organs_by_name = list()
+			if(!LAZYLEN(owner.internal_organs))
+				owner.internal_organs = list()
+			if(!LAZYLEN(owner.internal_organs_by_name))
+				owner.internal_organs_by_name = list()
 
-			holder.internal_organs |= src
-			holder.internal_organs_by_name[organ_tag] = src
+			owner.internal_organs |= src
+			owner.internal_organs_by_name[organ_tag] = src
 
 		else
-			if(!LAZYLEN(holder.organs))
-				holder.organs = list()
-			if(!LAZYLEN(holder.organs_by_name))
-				holder.organs_by_name = list()
+			if(!LAZYLEN(owner.organs))
+				owner.organs = list()
+			if(!LAZYLEN(owner.organs_by_name))
+				owner.organs_by_name = list()
 
-			holder.organs |= src
-			holder.organs_by_name[organ_tag] = src
+			owner.organs |= src
+			owner.organs_by_name[organ_tag] = src
 
 	if(!max_damage)
 		max_damage = min_broken_damage * 2
 
-	if(iscarbon(holder))
-		var/mob/living/carbon/C = holder
-		species = get_static_species_meta(/datum/species/human)
-		if(holder.dna)
+	if(iscarbon(owner))
+		var/mob/living/carbon/C = owner
+		species = SScharacters.resolve_species_path(/datum/species/human)
+		if(owner.dna)
 			dna = C.dna.Clone()
 			species = C.species //For custom species
 		else
@@ -48,7 +47,7 @@
 					blood_DNA = list()
 				blood_DNA[dna.unique_enzymes] = dna.b_type
 	else
-		species = get_static_species_meta(/datum/species/human)
+		species = SScharacters.resolve_species_path(/datum/species/human)
 
 	if(owner)
 		if(!meat_type)
@@ -86,7 +85,7 @@
 	if(damage >= max_damage)
 		die()
 
-/obj/item/organ/proc/set_dna(var/datum/dna/new_dna)
+/obj/item/organ/proc/set_dna(datum/dna/new_dna)
 	if(new_dna)
 		dna = new_dna.Clone()
 		if(blood_DNA)
@@ -179,7 +178,7 @@
 
 //Note: external organs have their own version of this proc
 /obj/item/organ/take_damage(amount, var/silent=0)
-	ASSERT(amount > 0)
+	ASSERT(amount >= 0)
 	if(src.robotic >= ORGAN_ROBOT)
 		src.damage = between(0, src.damage + (amount * 0.8), max_damage)
 	else
@@ -293,7 +292,7 @@
 	handle_organ_proc_special()
 
 	//Process infections
-	if(robotic >= ORGAN_ROBOT || (istype(owner) && (owner.species && (owner.species.flags & (IS_PLANT | NO_INFECT)))))
+	if(robotic >= ORGAN_ROBOT || (istype(owner) && (owner.species && (owner.species.species_flags & (IS_PLANT | NO_INFECT)))))
 		germ_level = 0
 		return
 
@@ -317,7 +316,7 @@
 	handle_organ_proc_special()
 
 	//Process infections
-	if(robotic >= ORGAN_ROBOT || (istype(owner) && (owner.species && (owner.species.flags & (IS_PLANT | NO_INFECT)))))
+	if(robotic >= ORGAN_ROBOT || (istype(owner) && (owner.species && (owner.species.species_flags & (IS_PLANT | NO_INFECT)))))
 		germ_level = 0
 		return
 
@@ -359,7 +358,7 @@
 
 /obj/item/organ/proc/handle_decay(dt)
 	var/multiplier = CONFIG_GET(number/organ_decay_multiplier)
-	take_damage(dt * decay_rate, TRUE)
+	take_damage(dt * decay_rate * multiplier, TRUE)
 
 /**
  * do we need to process?
@@ -597,7 +596,7 @@
 
 
 /obj/item/organ/proc/organ_can_feel_pain()
-	if(species.flags & NO_PAIN)
+	if(species.species_flags & NO_PAIN)
 		return FALSE
 	if(status & ORGAN_DESTROYED)
 		return FALSE
@@ -608,6 +607,12 @@
 	return 1
 
 /obj/item/organ/proc/handle_organ_mod_special(var/removed = FALSE)	// Called when created, transplanted, and removed.
+	// todo: better way
+	if(owner)
+		rad_flags |= RAD_NO_CONTAMINATE
+	else
+		rad_flags &= ~RAD_NO_CONTAMINATE
+
 	if(!istype(owner))
 		return
 
@@ -626,11 +631,11 @@
 
 	if(!removed && organ_verbs && check_verb_compatability())
 		for(var/verb_path in organ_verbs)
-			owner.verbs |= verb_path
+			add_verb(owner, verb_path)
 	else if(organ_verbs)
 		for(var/verb_path in organ_verbs)
 			if(!(verb_path in save_verbs))
-				owner.verbs -= verb_path
+				remove_verb(owner, verb_path)
 	return
 
 /// Called when processed.
@@ -677,7 +682,8 @@
 	var/dead = !!(status & ORGAN_DEAD)
 	if(dead && !force && !can_revive)
 		return FALSE
-	damage = clamp(damage - round(amount, DAMAGE_PRECISION), 0, max_damage)
+	//? which is better again..?
+	// damage = clamp(damage - round(amount, DAMAGE_PRECISION), 0, max_damage)
+	damage = clamp(round(damage - amount, DAMAGE_PRECISION), 0, max_damage)
 	if(dead && can_revive)
 		revive()
-

@@ -22,7 +22,6 @@ var/const/MAX_ACTIVE_TIME = 400
 	icon_state = "facehugger"
 	item_state = "facehugger"
 	w_class = 3 //note: can be picked up by aliens unlike most other items of w_class below 4
-	flags = PROXMOVE
 	body_parts_covered = FACE|EYES
 	throw_range = 5
 
@@ -37,10 +36,9 @@ var/const/MAX_ACTIVE_TIME = 400
 			return
 	..()
 
-/obj/item/clothing/mask/facehugger/attack(mob/living/M as mob, mob/user as mob)
-	..()
+/obj/item/clothing/mask/facehugger/attack_mob(mob/target, mob/user, clickchain_flags, list/params, mult, target_zone, intent)
 	user.drop_item_to_ground(src, INV_OP_FORCE)
-	Attach(M)
+	Attach(target)
 
 //Bypasses the config check because it's completely blocking spawn.
 /*
@@ -83,20 +81,20 @@ var/const/MAX_ACTIVE_TIME = 400
 
 /obj/item/clothing/mask/facehugger/Crossed(atom/target)
 	..()
-	HasProximity(target)
+	Proximity(null, target)
 	return
 
 /obj/item/clothing/mask/facehugger/on_found(mob/finder as mob)
 	if(stat == CONSCIOUS)
-		HasProximity(finder)
+		Proximity(null, finder)
 		return 1
 	return
 
-/obj/item/clothing/mask/facehugger/HasProximity(atom/movable/AM as mob|obj)
+/obj/item/clothing/mask/facehugger/Proximity(datum/proxfield/field, atom/movable/AM)
 	if(CanHug(AM))
 		Attach(AM)
 
-/obj/item/clothing/mask/facehugger/throw_at(atom/target, range, speed)
+/obj/item/clothing/mask/facehugger/throw_at_old(atom/target, range, speed)
 	..()
 	if(stat == CONSCIOUS)
 		icon_state = "[initial(icon_state)]_thrown"
@@ -108,7 +106,7 @@ var/const/MAX_ACTIVE_TIME = 400
 	..()
 	if(stat == CONSCIOUS)
 		icon_state = "[initial(icon_state)]"
-		throwing = 0
+		throwing = null
 	GoIdle(30,100) //stunned for a few seconds - allows throwing them to be useful for positioning but not as an offensive action (unless you're setting up a trap)
 
 /obj/item/clothing/mask/facehugger/proc/Attach(M as mob)
@@ -173,7 +171,7 @@ var/const/MAX_ACTIVE_TIME = 400
 		target.equip_to_slot_if_possible(src, SLOT_ID_MASK, INV_OP_FLUFFLESS)
 
 	if(!sterile)
-		L.Paralyse(MAX_IMPREGNATION_TIME/6) //something like 25 ticks = 20 seconds with the default settings
+		L.Unconscious(MAX_IMPREGNATION_TIME/6) //something like 25 ticks = 20 seconds with the default settings
 
 	GoIdle() //so it doesn't jump the people that tear it off
 
@@ -378,7 +376,7 @@ var/const/MAX_ACTIVE_TIME = 400
 	if(CanHug(AM))
 		Attach(AM)
 
-/obj/item/clothing/mask/facehugger/throw_at(atom/target, range, speed)
+/obj/item/clothing/mask/facehugger/throw_at_old(atom/target, range, speed)
 	..()
 	if(stat == CONSCIOUS)
 		icon_state = "[initial(icon_state)]_thrown"
@@ -432,7 +430,7 @@ var/const/MAX_ACTIVE_TIME = 400
 		target.equip_to_slot(src, SLOT_ID_MASK)
 		target.contents += src // Monkey sanity check - Snapshot
 
-		if(!sterile) L.Paralyse(MAX_IMPREGNATION_TIME/6) //something like 25 ticks = 20 seconds with the default settings
+		if(!sterile) L.Unconscious(MAX_IMPREGNATION_TIME/6) //something like 25 ticks = 20 seconds with the default settings
 
 	GoIdle() //so it doesn't jump the people that tear it off
 

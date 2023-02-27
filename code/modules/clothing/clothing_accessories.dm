@@ -122,7 +122,7 @@
 /obj/item/clothing/proc/attach_accessory(mob/user, obj/item/clothing/accessory/A)
 	LAZYADD(accessories,A)
 	A.on_attached(src, user)
-	src.verbs |= /obj/item/clothing/proc/removetie_verb
+	add_obj_verb(src, /obj/item/clothing/proc/removetie_verb)
 	update_accessory_slowdown()
 	update_worn_icon()
 
@@ -144,15 +144,23 @@
 	set name = "Remove Accessory"
 	set category = "Object"
 	set src in usr
-	if(!istype(usr, /mob/living)) return
-	if(usr.stat) return
+	if(!istype(usr, /mob/living))
+		return
+	if(usr.stat)
+		return
 	var/obj/item/clothing/accessory/A
-	if(LAZYLEN(accessories))
-		A = input("Select an accessory to remove from [src]") as null|anything in accessories
+	if(!LAZYLEN(accessories))
+		return
+	var/list/choices = list()
+	for(var/i in accessories)
+		choices[i] = i
+	A = show_radial_menu(usr, src, choices)
+	if(!usr || usr.stat || !(src in usr))
+		return
 	if(A)
 		remove_accessory(usr,A)
 	if(!LAZYLEN(accessories))
-		src.verbs -= /obj/item/clothing/proc/removetie_verb
+		remove_verb(src, /obj/item/clothing/proc/removetie_verb)
 		accessories = null
 
 /obj/item/clothing/emp_act(severity)

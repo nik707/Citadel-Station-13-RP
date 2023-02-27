@@ -7,13 +7,10 @@
  */
 
 /obj/item/rig
-
 	name = "hardsuit control module"
 	icon = 'icons/obj/rig_modules.dmi'
 	desc = "A back-mounted hardsuit deployment and control mechanism."
 	slot_flags = SLOT_BACK
-	req_one_access = list()
-	req_access = list()
 	w_class = ITEMSIZE_HUGE
 	action_button_name = "Toggle Heatsink"
 
@@ -157,23 +154,23 @@
 		air_supply = new air_type(src)
 	if(glove_type)
 		gloves = new glove_type(src)
-		verbs |= /obj/item/rig/proc/toggle_gauntlets
+		add_obj_verb(src, /obj/item/rig/proc/toggle_gauntlets)
 	if(helm_type)
 		helmet = new helm_type(src)
-		verbs |= /obj/item/rig/proc/toggle_helmet
+		add_obj_verb(src, /obj/item/rig/proc/toggle_helmet)
 	if(boot_type)
 		boots = new boot_type(src)
-		verbs |= /obj/item/rig/proc/toggle_boots
+		add_obj_verb(src, /obj/item/rig/proc/toggle_boots)
 	if(chest_type)
 		chest = new chest_type(src)
 		if(allowed)
 			chest.allowed = allowed
-		verbs |= /obj/item/rig/proc/toggle_chest
+		add_obj_verb(src, /obj/item/rig/proc/toggle_chest)
 
 	for(var/obj/item/piece in list(gloves,helmet,boots,chest))
 		if(!istype(piece))
 			continue
-		ADD_TRAIT(piece, TRAIT_NODROP, RIG_TRAIT)
+		ADD_TRAIT(piece, TRAIT_ITEM_NODROP, RIG_TRAIT)
 		piece.name = "[suit_type] [initial(piece.name)]"
 		piece.desc = "It seems to be part of a [src.name]."
 		piece.icon_state = "[suit_state]"
@@ -192,19 +189,22 @@
 	for(var/obj/item/piece in list(gloves,boots,helmet,chest))
 		qdel(piece)
 	STOP_PROCESSING(SSobj, src)
+	if(minihud)
+		QDEL_NULL(minihud)
 	qdel(wires)
 	wires = null
 	qdel(spark_system)
 	spark_system = null
 	return ..()
 
-/obj/item/rig/get_worn_icon_file(var/body_type,var/slot_id,var/default_icon,var/inhands)
-	if(!inhands && (slot_id == SLOT_ID_BACK || slot_id == SLOT_ID_BELT))
-		if(icon_override)
-			return icon_override
-		else if(mob_icon)
-			return mob_icon
-
+/obj/item/rig/render_mob_appearance(mob/M, slot_id_or_hand_index, bodytype)
+	switch(slot_id_or_hand_index)
+		if(SLOT_ID_BACK)
+			if(mob_icon)
+				return mob_icon
+		if(SLOT_ID_BELT)
+			if(mob_icon)
+				return mob_icon
 	return ..()
 
 /obj/item/rig/proc/suit_is_deployed()
@@ -237,15 +237,13 @@
 
 /obj/item/rig/proc/reset()
 	set_activation_state(RIG_ACTIVATION_OFF)
-	REMOVE_TRAIT(src, TRAIT_NODROP, RIG_TRAIT)
+	REMOVE_TRAIT(src, TRAIT_ITEM_NODROP, RIG_TRAIT)
 	//Reset the trap and upgrade it. Won't affect standard rigs.
 	trapSprung = 0
 	springtrapped = 1
+	update_component_sealed()
 	for(var/obj/item/piece in list(helmet,boots,gloves,chest))
-		if(!piece) continue
 		piece.icon_state = "[suit_state]"
-		if(airtight)
-			update_airtight(piece, 0) // Unseal
 	update_icon(1)
 
 /obj/item/rig/proc/trap(var/mob/living/carbon/human/M)
@@ -317,7 +315,7 @@
 		M.client.screen += booting_L
 		M.client.screen += booting_R
 
-	ADD_TRAIT(src, TRAIT_NODROP, RIG_TRAIT)
+	ADD_TRAIT(src, TRAIT_ITEM_NODROP, RIG_TRAIT)
 	set_activation_state(is_sealing? RIG_ACTIVATION_STARTUP : RIG_ACTIVATION_SHUTDOWN)
 
 	if(is_sealing && !suit_is_deployed())
@@ -391,13 +389,13 @@
 		for(var/obj/item/piece in list(helmet,boots,gloves,chest))
 			if(!piece)
 				continue
-			piece.icon_state = "[suit_state][is_activated() ? "" : "_sealed"]"
+			piece.icon_state = "[suit_state][is_activated() ? "_sealed" : ""]"
 			piece.update_worn_icon()
 
 		if(is_activated())
-			ADD_TRAIT(src, TRAIT_NODROP, RIG_TRAIT)
+			ADD_TRAIT(src, TRAIT_ITEM_NODROP, RIG_TRAIT)
 		else
-			REMOVE_TRAIT(src, TRAIT_NODROP, RIG_TRAIT)
+			REMOVE_TRAIT(src, TRAIT_ITEM_NODROP, RIG_TRAIT)
 		if(airtight)
 			update_component_sealed()
 		update_icon(1)
@@ -406,10 +404,10 @@
 	// Success!
 	if(is_sealing)
 		set_activation_state(RIG_ACTIVATION_ON)
-		ADD_TRAIT(src, TRAIT_NODROP, RIG_TRAIT)
+		ADD_TRAIT(src, TRAIT_ITEM_NODROP, RIG_TRAIT)
 	else
 		set_activation_state(RIG_ACTIVATION_OFF)
-		REMOVE_TRAIT(src, TRAIT_NODROP, RIG_TRAIT)
+		REMOVE_TRAIT(src, TRAIT_ITEM_NODROP, RIG_TRAIT)
 
 	if(M.hud_used)
 		if(!is_activated())
@@ -622,14 +620,6 @@
 	cell.use(cost*10)
 	return 1
 
-// this function displays the current cell charge in the stat panel
-/obj/item/rig/proc/show_cell_power()
-	if(cell)
-		stat(null, text("Charge Left: [round(cell.percent())]%"))
-		stat(null, text("Cell Rating: [round(cell.maxcharge)]")) // Round just in case we somehow get crazy values
-	else
-		stat(null, text("No Cell Inserted!"))
-
 /obj/item/rig/nano_ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1, var/nano_state = inventory_state)
 	if(!user)
 		return
@@ -642,8 +632,8 @@
 	if(src.loc != user)
 		data["ai"] = 1
 
-	data["seals"] =     "[src.is_activated()]"
-	data["sealing"] =   "[src.is_cycling()]"
+	data["seals"] =     is_activated()
+	data["sealing"] =   is_cycling()
 	data["helmet"] =    (helmet ? "[helmet.name]" : "None.")
 	data["gauntlets"] = (gloves ? "[gloves.name]" : "None.")
 	data["boots"] =     (boots ?  "[boots.name]" :  "None.")
@@ -705,10 +695,10 @@
 		ui.open()
 		ui.set_auto_update(1)
 
-/obj/item/rig/update_icon(var/update_mob_icon)
+/obj/item/rig/update_icon(update_mob_icon)
 
 	//TODO: Maybe consider a cache for this (use mob_icon as blank canvas, use suit icon overlay).
-	overlays.Cut()
+	cut_overlays()
 	if(!mob_icon || update_mob_icon)
 		var/species_icon = 'icons/mob/clothing/rig_back.dmi'
 		// Since setting mob_icon will override the species checks in
@@ -720,7 +710,7 @@
 	if(installed_modules.len)
 		for(var/obj/item/rig_module/module in installed_modules)
 			if(module.suit_overlay)
-				chest.overlays += image("icon" = 'icons/mob/clothing/rig_modules.dmi', "icon_state" = "[module.suit_overlay]", "dir" = SOUTH)
+				chest.add_overlay(image("icon" = 'icons/mob/clothing/rig_modules.dmi', "icon_state" = "[module.suit_overlay]", "dir" = SOUTH))
 
 	if(wearer)
 		wearer.update_inv_shoes()
@@ -1088,7 +1078,7 @@
 	// AIs are a bit slower than regular and ignore move intent.
 	wearer_move_delay = world.time + ai_controlled_move_delay
 
-	if(istype(wearer.buckled, /obj/vehicle))
+	if(istype(wearer.buckled, /obj/vehicle_old))
 		//manually set move_delay for vehicles so we don't inherit any mob movement penalties
 		//specific vehicle move delays are set in code\modules\vehicles\vehicle.dm
 		wearer_move_delay = world.time
@@ -1147,7 +1137,7 @@
 
 //Boot animation screen objects
 /atom/movable/screen/rig_booting
-	screen_loc = "1,1"
+	screen_loc = "CENTER-7,CENTER-7"
 	icon = 'icons/obj/rig_boot.dmi'
 	icon_state = ""
 	layer = SCREEN_LAYER
@@ -1158,13 +1148,6 @@
 //Shows cell charge on screen, ideally.
 
 var/atom/movable/screen/cells = null
-
-// update the status screen display
-/obj/item/rig/Stat()
-	..()
-	if (statpanel("Status"))
-		show_cell_power()
-
 
 #undef ONLY_DEPLOY
 #undef ONLY_RETRACT

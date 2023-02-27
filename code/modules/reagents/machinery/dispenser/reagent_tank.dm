@@ -28,7 +28,7 @@
 	reagents = R
 	R.my_atom = src
 	if (!possible_transfer_amounts)
-		src.verbs -= /obj/structure/reagent_dispensers/verb/set_APTFT
+		remove_obj_verb(src, /obj/structure/reagent_dispensers/verb/set_APTFT)
 
 	// InputSocket = new(src)
 	// InputSocket.carrier = src
@@ -55,7 +55,7 @@
 	if (N)
 		amount_per_transfer_from_this = N
 
-/obj/structure/reagent_dispensers/ex_act(severity)
+/obj/structure/reagent_dispensers/legacy_ex_act(severity)
 	switch(severity)
 		if(1.0)
 			qdel(src)
@@ -158,7 +158,7 @@
 			usr.visible_message("<span class='notice'>[usr] detaches [rig] from \the [src].</span>", "<span class='notice'>You detach [rig] from \the [src]</span>")
 			rig.loc = get_turf(usr)
 			rig = null
-			overlays = new/list()
+			cut_overlays()
 
 /obj/structure/reagent_dispensers/fueltank/attackby(obj/item/W as obj, mob/user as mob)
 	src.add_fingerprint(user)
@@ -166,7 +166,7 @@
 		user.visible_message("[user] wrenches [src]'s faucet [modded ? "closed" : "open"].", \
 			"You wrench [src]'s faucet [modded ? "closed" : "open"]")
 		modded = modded ? 0 : 1
-		playsound(src, W.usesound, 75, 1)
+		playsound(src, W.tool_sound, 75, 1)
 		if (modded)
 			message_admins("[key_name_admin(user)] opened fueltank at [loc.loc.name] ([loc.x],[loc.y],[loc.z]), leaking fuel. (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[loc.x];Y=[loc.y];Z=[loc.z]'>JMP</a>)")
 			log_game("[key_name(user)] opened fueltank at [loc.loc.name] ([loc.x],[loc.y],[loc.z]), leaking fuel.")
@@ -189,10 +189,10 @@
 
 			rig = W
 
-			var/icon/test = getFlatIcon(W)
+			var/icon/test = get_flat_icon(W)
 			test.Shift(NORTH,1)
 			test.Shift(EAST,6)
-			overlays += test
+			add_overlay(test)
 
 	return ..()
 
@@ -206,7 +206,7 @@
 		if(!istype(Proj ,/obj/item/projectile/beam/lasertag) && !istype(Proj ,/obj/item/projectile/beam/practice) )
 			explode()
 
-/obj/structure/reagent_dispensers/fueltank/ex_act()
+/obj/structure/reagent_dispensers/fueltank/legacy_ex_act()
 	explode()
 
 /obj/structure/reagent_dispensers/fueltank/blob_act()
@@ -298,7 +298,7 @@
 	if(I.is_wrench())
 		src.add_fingerprint(user)
 		if(bottle)
-			playsound(src, I.usesound, 50, 1)
+			playsound(src, I.tool_sound, 50, 1)
 			if(do_after(user, 20) && bottle)
 				to_chat(user, "<span class='notice'>You unfasten the jug.</span>")
 				var/obj/item/reagent_containers/glass/cooler_bottle/G = new /obj/item/reagent_containers/glass/cooler_bottle( src.loc )
@@ -313,16 +313,16 @@
 				user.visible_message("\The [user] begins unsecuring \the [src] from the floor.", "You start unsecuring \the [src] from the floor.")
 			else
 				user.visible_message("\The [user] begins securing \the [src] to the floor.", "You start securing \the [src] to the floor.")
-			if(do_after(user, 20 * I.toolspeed, src))
+			if(do_after(user, 20 * I.tool_speed, src))
 				if(!src) return
 				to_chat(user, "<span class='notice'>You [anchored? "un" : ""]secured \the [src]!</span>")
 				anchored = !anchored
-				playsound(src, I.usesound, 50, 1)
+				playsound(src, I.tool_sound, 50, 1)
 		return
 
 	if(I.is_screwdriver())
 		if(cupholder)
-			playsound(src, I.usesound, 50, 1)
+			playsound(src, I.tool_sound, 50, 1)
 			to_chat(user, "<span class='notice'>You take the cup dispenser off.</span>")
 			new /obj/item/stack/material/plastic( src.loc )
 			if(cups)
@@ -333,9 +333,9 @@
 			update_icon()
 			return
 		if(!bottle && !cupholder)
-			playsound(src, I.usesound, 50, 1)
+			playsound(src, I.tool_sound, 50, 1)
 			to_chat(user, "<span class='notice'>You start taking the water-cooler apart.</span>")
-			if(do_after(user, 20 * I.toolspeed) && !bottle && !cupholder)
+			if(do_after(user, 20 * I.tool_speed) && !bottle && !cupholder)
 				to_chat(user, "<span class='notice'>You take the water-cooler apart.</span>")
 				new /obj/item/stack/material/plastic( src.loc, 4 )
 				qdel(src)
@@ -388,11 +388,11 @@
 
 /obj/structure/reagent_dispensers/water_cooler/update_icon()
 	icon_state = "water_cooler"
-	overlays.Cut()
+	cut_overlays()
 	var/image/I
 	if(bottle)
 		I = image(icon, "water_cooler_bottle")
-		overlays += I
+		add_overlay(I)
 	return
 
 /obj/structure/reagent_dispensers/beerkeg
@@ -454,7 +454,7 @@
 	if(Proj.get_structure_damage())
 		explode()
 
-/obj/structure/reagent_dispensers/cookingoil/ex_act()
+/obj/structure/reagent_dispensers/cookingoil/legacy_ex_act()
 	explode()
 
 /obj/structure/reagent_dispensers/cookingoil/proc/explode()

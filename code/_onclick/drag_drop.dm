@@ -31,7 +31,8 @@
 	var/proximity = Adjacent(usr) && over_object.Adjacent(usr)
 	if(proximity)
 		// this one only runs if the above pass. legacy behavior.
-		over_object.MouseDroppedOnLegacy(src, user, params)
+		if(over_object.MouseDroppedOnLegacy(src, user, params) & CLICKCHAIN_DO_NOT_PROPAGATE)
+			return
 
 	if(SEND_SIGNAL(src, COMSIG_MOUSEDROP_ONTO, over_object, user, proximity, params) & COMPONENT_NO_MOUSEDROP)
 		return
@@ -53,7 +54,7 @@
  * - params - click params
  */
 /atom/proc/OnMouseDrop(atom/over, mob/user, proximity, params)
-
+	return NONE
 
 /**
  * we were dropped onto over object
@@ -74,6 +75,7 @@
  * - params - click params
  */
 /atom/proc/MouseDroppedOn(atom/dropping, mob/user, proximity, params)
+	return NONE
 
 /**
  * user dropped an atom on us with mouse-drag-drop

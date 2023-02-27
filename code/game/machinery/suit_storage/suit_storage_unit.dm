@@ -67,7 +67,7 @@
 			dump_everything()
 			update_icon()
 
-/obj/machinery/suit_storage_unit/ex_act(severity)
+/obj/machinery/suit_storage_unit/legacy_ex_act(severity)
 	switch(severity)
 		if(1.0)
 			if(prob(50))
@@ -313,7 +313,7 @@
 	for(i=0,i<4,i++)
 		sleep(50)
 		if(occupant)
-			occupant.apply_effect(50, IRRADIATE)
+			occupant.afflict_radiation(200)
 			var/obj/item/organ/internal/diona/nutrients/rad_organ = locate() in occupant.internal_organs
 			if(!rad_organ)
 				if(occupant.can_feel_pain())
@@ -463,7 +463,7 @@
 		return
 	if(I.is_screwdriver())
 		panelopen = !panelopen
-		playsound(src, I.usesound, 100, 1)
+		playsound(src, I.tool_sound, 100, 1)
 		to_chat(user, "<font color=#4F49AF>You [panelopen ? "open up" : "close"] the unit's maintenance panel.</font>")
 		updateUsrDialog()
 		return

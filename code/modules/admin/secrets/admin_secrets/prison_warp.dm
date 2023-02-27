@@ -1,10 +1,6 @@
 /datum/admin_secret_item/admin_secret/prison_warp
 	name = "Prison Warp"
 
-/datum/admin_secret_item/admin_secret/prison_warp/can_execute(var/mob/user)
-	if(!SSticker) return 0
-	return ..()
-
 /datum/admin_secret_item/admin_secret/prison_warp/execute(var/mob/user)
 	. = ..()
 	if(!.)
@@ -15,7 +11,7 @@
 		if((T && (T in GLOB.using_map.admin_levels)) || prisonwarped.Find(H))
 		//don't warp them if they aren't ready or are already there
 			continue
-		H.Paralyse(5)
+		H.Unconscious(5)
 		if(H.wear_id)
 			var/obj/item/card/id/id = H.get_idcard()
 			for(var/A in id.access)
